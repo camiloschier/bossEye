@@ -20,16 +20,25 @@ import { Grid, Row, Col } from "react-bootstrap";
 
 import Card from "components/Card/Card.jsx";
 
-fetch('http://jsonplaceholder.typicode.com/users')
-        .then(res => res.json())
-        .then((data) => {
-          this.setState({ contacts: data })
-        })
-        .catch(console.log)
 
 class DetalleEventos extends Component {
+
+  peticionApi(params) {
+    var url = "http://chaco.teledirecto.com:3003/tdr/2020-05-03/15:00:00/2020-05-03/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    fetch('http://chaco.teledirecto.com:3003/tdr/2020-05-03/15:00:00/2020-05-03/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91')
+        .then(res => res.json())
+        .then((data) => {
+          console.log({data })
+        })
+        .catch(console.log)
+  }
+
+  
+  
   render() {
+    this.peticionApi()
     return (
+      
       <div className="content">
         <Grid fluid>
           
@@ -40,100 +49,14 @@ class DetalleEventos extends Component {
                 // category="Created using Roboto Font Family"
                 content={
                   <div>
-                    <p>Aplicacion:</p>
-                    <p>Titulo:</p>
-                    <p>Movimiento:</p>
-                    <p>Calificación:</p>
-                  </div>
-                }
-              />
-            </Col>
-            <Col md={12}>
-              <Card
-                title="21/04/20 - 14:30:31"
-                // category="Created using Roboto Font Family"
-                content={
-                  <div>
-                    <p>Aplicacion:</p>
-                    <p>Titulo:</p>
-                    <p>Movimiento:</p>
-                    <p>Calificación:</p>
-                  </div>
-                }
-              />
-            </Col>
-            <Col md={12}>
-              <Card
-                title="21/04/20 - 14:30:31"
-                // category="Created using Roboto Font Family"
-                content={
-                  <div>
-                    <p>Aplicacion:</p>
-                    <p>Titulo:</p>
-                    <p>Movimiento:</p>
-                    <p>Calificación:</p>
-                  </div>
-                }
-              />
-            </Col>
-            <Col md={12}>
-              <Card
-                title="21/04/20 - 14:30:31"
-                // category="Created using Roboto Font Family"
-                content={
-                  <div>
-                    <p>Aplicacion:</p>
-                    <p>Titulo:</p>
-                    <p>Movimiento:</p>
-                    <p>Calificación:</p>
-                  </div>
-                }
-              />
-            </Col>
-            <Col md={12}>
-              <Card
-                title="21/04/20 - 14:30:31"
-                // category="Created using Roboto Font Family"
-                content={
-                  <div>
-                    <p>Aplicacion:</p>
-                    <p>Titulo:</p>
-                    <p>Movimiento:</p>
-                    <p>Calificación:</p>
-                  </div>
-                }
-              />
-            </Col>
-            <Col md={12}>
-              <Card
-                title="21/04/20 - 14:30:31"
-                // category="Created using Roboto Font Family"
-                content={
-                  <div>
-                    <p>Aplicacion:</p>
-                    <p>Titulo:</p>
-                    <p>Movimiento:</p>
-                    <p>Calificación:</p>
-                  </div>
-                }
-              />
-            </Col>
-            <Col md={12}>
-              <Card
-                title="21/04/20 - 14:30:31"
-                // category="Created using Roboto Font Family"
-                content={
-                  <div>
-                    <p>Aplicacion:</p>
-                    <p>Titulo:</p>
-                    <p>Movimiento:</p>
-                    <p>Calificación:</p>
+                    <p>Aplicacion: Firefox | Titulo: Facebook</p>
+                    <p>Movimiento Mouse: SI | Movimiento Teclado: NO </p>
+                    <p>Calificación: Comunicacion</p>
                   </div>
                 }
               />
             </Col>
 
-            
           </Row>
         </Grid>
       </div>
