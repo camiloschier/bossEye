@@ -69,6 +69,7 @@ class Dashboard extends Component {
                 statsIconText="Last day"
               />
             </Col>
+            C:\Users\PC Virtual 1\Documents\boss_eye\boss_eye.au3 -
             <Col lg={3} sm={6}>
               <StatsCard
                 bigIcon={<i className="pe-7s-graph1 text-danger" />}

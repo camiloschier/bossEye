@@ -1,0 +1,12 @@
+.tarjeta-detalles{
+    display:flex;
+
+}
+.tarjeta-detalles-texto{
+    width: 80%;
+}
+.tarjeta-detalles-imagen{
+    height: 100px;
+    width: 100px;
+    background-color: blue;
+}
