@@ -17,14 +17,18 @@
 */
 import React, { Component } from "react";
 import ChartistGraph from "react-chartist";
-import { Grid, Row, Col } from "react-bootstrap";
+import { Grid, Row, Col, Button } from "react-bootstrap";
 import { FormInputs } from "components/FormInputs/FormInputs.jsx";
 import { Card } from "components/Card/Card.jsx";
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
 import { Tasks } from "components/Tasks/Tasks.jsx";
+import DatePicker, { registerLocale } from "react-datepicker";
+import es from "date-fns/locale/es"; // the locale you want
+
+import "react-datepicker/dist/react-datepicker.css";
+
 import {
-  dataPie,
-  legendPie,
+  
   dataSales,
   optionsSales,
   responsiveSales,
@@ -34,8 +38,54 @@ import {
   responsiveBar,
   legendBar
 } from "variables/Variables.jsx";
+registerLocale("es", es);
+
+var moment = require('moment');
+var dataPie = {
+  labels: ["40%", "50%", "10%"],
+  series: [40, 50, 10]
+};
+var legendPie = {
+  names: ["Tarea", "Distraccion", "Comunicacion"],
+  types: ["info", "danger", "warning"]
+};
 
 class Dashboard extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      //Estos son objetos del dia
+      datosApi: [],
+
+      objetoDatos: {
+        labels: [],
+        series: []
+      },
+      objetoLeyenda:{
+        names: [],
+        types: ["info","danger","warning"]
+      },
+      //Terminan objetos del dia
+      datosApiHora: [],
+      // tiposEtiquetas:[],
+      // datosEtiquetas:[],
+      //Estos son objetos de la hora
+      objetoDatosHora: {
+        labels: [],
+        series: []
+      },
+      objetoLeyendaHora:{
+        names: [],
+        types: ["info","danger","warning"]
+      },
+      //Terminan objetos de la hora
+  
+
+      //DatePicker
+      startDate: new Date(),
+    }
+  }
+ 
   createLegend(json) {
     var legend = [];
     for (var i = 0; i < json["names"].length; i++) {
@@ -46,71 +96,301 @@ class Dashboard extends Component {
     }
     return legend;
   }
+  
+  handleChange = date => {
+    this.setState({
+      startDate: date
+    });
+  };
+
+  componentDidMount(){
+    this.peticionApi();
+    //this.getDatosDiarios();
+    //this.getDatosHora();
+  }
+
+  getDatosDiarios(fecha){
+    let fechaActual = moment(fecha).format("YYYY-MM-DD");
+
+    //console.log("FECHA ACTUAL", fechaActual)
+
+    this.peticionApiPorFecha(fechaActual);
+  }
+
+  getDatosHora(){
+    let fechaActual = moment("05/10/2020").format("YYYY-MM-DD");
+    let horaActual = moment("05/10/2020 16:30").format("HH:mm:ss");
+    let horaActualMasUno = moment("05/10/2020 16:30").add(1, 'h').format("HH:mm:ss");
+    console.log("HORA ACTUAL",horaActualMasUno);
+    this.peticionApiPorHora(fechaActual,horaActual,horaActualMasUno)
+  }
+  peticionApi() {
+    //ESTA ME DA EL DEL DIA ANTERIOR
+    let fecha = moment().subtract(1,'d').format("YYYY-MM-DD");
+    console.log("FECHA", fecha)
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/00:00:00/"+fecha+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    fetch(url)
+        .then(res => res.json())
+        .then((data) => {
+          this.setState({ datosApi: data })
+          
+        })
+        .then( (datos) => {console.log("DATOS HORA",this.state.datosApiHora)})
+        .then(() => this.obtenerEtiquetas())
+        .catch(console.log)
+    
+  }
+  peticionApiPorFecha(fecha) {
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/00:00:00/"+fecha+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    fetch(url)
+        .then(res => res.json())
+        .then((data) => {
+          this.setState({ datosApi: data })
+          
+        })
+        .then( (datos) => {console.log("DATOS HORA",this.state.datosApiHora)})
+        .then(() => this.obtenerEtiquetas())
+        .catch(console.log)
+    
+  }
+
+  peticionApiPorHora(fecha,horaDesde, horaHasta){
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/"+horaDesde+"/"+fecha+"/"+horaHasta+"/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    fetch(url)
+        .then(res => res.json())
+        .then((data) => {
+          this.setState({ datosApi: data })
+          
+        })
+        .then( (datos) => {console.log("DATOS",this.state.datosApiHora)})
+        // .then(() => this.obtenerEtiquetas())
+        .catch(console.log)
+    
+  }
+
+  //ESTE OBTIENE ETIQUETAS DEL DIA
+  obtenerEtiquetas(){
+    //1ero recorro el array y añado etiquetas
+    let etiquetas = []
+
+    
+
+    for (let index = 0; index < this.state.datosApi.length; index++) {
+      const element = this.state.datosApi[index];
+
+      let calificacion = element.calificacion;
+      let valor = 1
+      //chequeo si el elemento está en el array, si no está lo añado
+      if (!etiquetas.includes(element.calificacion)) {
+        if (element.calificacion == null) {
+          element.calificacion = "Desconocido"
+          
+          if(etiquetas.indexOf("Desconocido") == -1)
+            {
+              etiquetas.push(element.calificacion)
+            }
+        }
+        else{
+          etiquetas.push(element.calificacion)
+        }
+        
+      }
+    }
+    //el array etiquetas queda cargado con las etiquetas
+    
+    this.setState({tiposEtiquetas: etiquetas})
+
+    
+    this.calcularCantidades(etiquetas)
+  }
+
+
+  //ESTE CALCULA CANTIDADES PARA EL DIA
+  calcularCantidades(etiquetas){
+    
+    let cantidades =[]
+    //2do recorro el array original y cuento cantidades
+    for (let index = 0; index < etiquetas.length; index++) {
+      // console.log("ETIQUETA ES", etiquetas[index])
+      let pruebas = this.state.datosApi.filter(elem => elem.calificacion == etiquetas[index])
+      
+      cantidades.push(pruebas.length)
+    }
+
+    this.setState({datosEtiquetas: cantidades})
+
+    //ETIQUETAS Y CANTIDADES ESTAN EN EL MISMO ORDEN
+  
+
+    //SETEO EL STATE DE: ObjetoDatos y ObjetoLeyenda
+    this.setState({
+      objetoDatos:{
+        ...this.state.objetoDatos,
+        labels: etiquetas,
+        series: cantidades
+      },
+      objetoLeyenda:{
+        ...this.state.objetoLeyenda,
+        names: etiquetas
+      }
+    })
+
+    console.log(this.state.objetoDatos)
+
+    
+  }
+
+
+  //ESTOS OBTIENEN ETIQUETAS HORA
+  obtenerEtiquetasHora(){
+    //1ero recorro el array y añado etiquetas
+    let etiquetas = []
+
+    
+
+    for (let index = 0; index < this.state.datosApiHora.length; index++) {
+      const element = this.state.datosApi[index];
+
+      let calificacion = element.calificacion;
+      let valor = 1
+      //chequeo si el elemento está en el array, si no está lo añado
+      if (!etiquetas.includes(element.calificacion)) {
+        if (element.calificacion == null) {
+          element.calificacion = "Desconocido"
+          
+          if(etiquetas.indexOf("Desconocido") == -1)
+            {
+              etiquetas.push(element.calificacion)
+            }
+        }
+        else{
+          etiquetas.push(element.calificacion)
+        }
+        
+      }
+    }
+    //el array etiquetas queda cargado con las etiquetas
+    
+    this.setState({tiposEtiquetas: etiquetas})
+
+    
+    this.calcularCantidades(etiquetas)
+  }
+
   render() {
     return (
       <div className="content">
         <Grid fluid>
-          {/* <Row>
-            <Col lg={3} sm={6}>
-              <StatsCard
-                bigIcon={<i className="pe-7s-server text-warning" />}
-                statsText="Capacity"
-                statsValue="105GB"
-                statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Updated now"
-              />
-            </Col>
-            <Col lg={3} sm={6}>
-              <StatsCard
-                bigIcon={<i className="pe-7s-wallet text-success" />}
-                statsText="Revenue"
-                statsValue="$1,345"
-                statsIcon={<i className="fa fa-calendar-o" />}
-                statsIconText="Last day"
-              />
-            </Col>
-            C:\Users\PC Virtual 1\Documents\boss_eye\boss_eye.au3 -
-            <Col lg={3} sm={6}>
-              <StatsCard
-                bigIcon={<i className="pe-7s-graph1 text-danger" />}
-                statsText="Errors"
-                statsValue="23"
-                statsIcon={<i className="fa fa-clock-o" />}
-                statsIconText="In the last hour"
-              />
-            </Col>
-            <Col lg={3} sm={6}>
-              <StatsCard
-                bigIcon={<i className="fa fa-twitter text-info" />}
-                statsText="Followers"
-                statsValue="+45"
-                statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Updated now"
-              />
-            </Col>
-          </Row> */}
+        
+        {  
+          this.state.datosApi.length > 0 ?
+          <>
           <Row>
-            {/* <Col md={6}>
+              <Col md={3}>
               <Card
               
               content={
-                <FormInputs
-                      ncols={["col-md-12"]}
-                      properties={[
-                        {
-                          label: "Usuario",
-                          type: "text",
-                          bsClass: "form-control",
-                          placeholder: "Buscar usuario..",
-                          
-                        }
-                        
-                      ]}
-                    />
+                  <div style={{textAlign:'center'}}>
+                  
+                  <DatePicker
+                      locale="es"
+                      selected={this.state.startDate}
+                      onChange={this.handleChange}
+                      
+                      
+                      
+                      dateFormat="MMMM d, yyyy "
+                  />
+                  <hr/>
+                  <Button variant="primary" style={{marginLeft:'10px'}} onClick={() => this.getDatosDiarios(this.state.startDate)}>
+                    BUSCAR POR FECHA
+                  </Button>
+                  
+                  </div>
               }
 
               />
+              </Col>
+          </Row>
+          <Row>   
+            <Col md={4}>
+              <Card
+                
+                title="Usuario: Camilo Perona"
+                showTitle={true}
+                category="Reporte Diario Total"
+                // statsIcon="fa fa-clock-o"
+                // stats="Campaign sent 2 days ago"
+                content={
+                  <div
+                    id="chartPreferences"
+                    className="ct-chart ct-perfect-fourth"
+                  >
+                    
+                    <ChartistGraph data={this.state.objetoDatos} type="Pie"/>
+                  </div>
+                }
+                legend={
+                  <div className="legend">{this.createLegend(this.state.objetoLeyenda)}</div>
+                }
+                showFooter={true}
+              />
+              {/* {this.calcularEstadistica()} */}
+              
+            </Col>
+            <Col md={4}>
+              <Card
+                
+                title="Usuario: Camilo Perona"
+                showTitle={true}
+                category="Reporte Por hora"
+                // statsIcon="fa fa-clock-o"
+                // stats="Campaign sent 2 days ago"
+                content={
+                  <div
+                    id="chartPreferences"
+                    className="ct-chart ct-perfect-fourth"
+                  >
+                    
+                    <ChartistGraph data={dataPie} type="Pie"/>
+                  </div>
+                }
+                legend={
+                  <div className="legend">{this.createLegend(legendPie)}</div>
+                }
+                showFooter={true}
+              />
+            </Col>
+            </Row>
+            </>
+            :
+            "CARGANDO"
+   }
+            {/* <Col md={4}>
+              <Card
+                
+                title="Usuario: Camilo Perona"
+                category="Performance"
+                // statsIcon="fa fa-clock-o"
+                // stats="Campaign sent 2 days ago"
+                content={
+                  <div
+                    id="chartPreferences"
+                    className="ct-chart ct-perfect-fourth"
+                  >
+                    <ChartistGraph data={dataPie} type="Pie" />
+                  </div>
+                }
+                legend={
+                  <div className="legend">{this.createLegend(legendPie)}</div>
+                }
+                showFooter={true}
+              />
             </Col> */}
+            
+          
+          {/* <Row>
+            
             <Col md={3}>
               <Card
               
@@ -155,93 +435,10 @@ class Dashboard extends Component {
 
               />
             </Col>
-          </Row>
-          <Row>
-            <Col md={4}>
-              <Card
-                
-                title="Usuario: Camilo Perona"
-                category="Performance"
-                // statsIcon="fa fa-clock-o"
-                // stats="Campaign sent 2 days ago"
-                content={
-                  <div
-                    id="chartPreferences"
-                    className="ct-chart ct-perfect-fourth"
-                  >
-                    <ChartistGraph data={dataPie} type="Pie" />
-                  </div>
-                }
-                legend={
-                  <div className="legend">{this.createLegend(legendPie)}</div>
-                }
-                showFooter={true}
-              />
-            </Col>
-            <Col md={4}>
-              <Card
-                
-                title="Usuario: Camilo Perona"
-                category="Performance"
-                // statsIcon="fa fa-clock-o"
-                // stats="Campaign sent 2 days ago"
-                content={
-                  <div
-                    id="chartPreferences"
-                    className="ct-chart ct-perfect-fourth"
-                  >
-                    <ChartistGraph data={dataPie} type="Pie" />
-                  </div>
-                }
-                legend={
-                  <div className="legend">{this.createLegend(legendPie)}</div>
-                }
-                showFooter={true}
-              />
-            </Col>
-            
-          </Row>
-
-          {/* <Row>
-            <Col md={6}>
-              <Card
-                id="chartActivity"
-                title="2014 Sales"
-                category="All products including Taxes"
-                stats="Data information certified"
-                statsIcon="fa fa-check"
-                content={
-                  <div className="ct-chart">
-                    <ChartistGraph
-                      data={dataBar}
-                      type="Bar"
-                      options={optionsBar}
-                      responsiveOptions={responsiveBar}
-                    />
-                  </div>
-                }
-                legend={
-                  <div className="legend">{this.createLegend(legendBar)}</div>
-                }
-              />
-            </Col>
-
-            <Col md={6}>
-              <Card
-                title="Tasks"
-                category="Backend development"
-                stats="Updated 3 minutes ago"
-                statsIcon="fa fa-history"
-                content={
-                  <div className="table-full-width">
-                    <table className="table">
-                      <Tasks />
-                    </table>
-                  </div>
-                }
-              />
-            </Col>
           </Row> */}
+          
+
+          
         </Grid>
       </div>
     );

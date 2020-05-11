@@ -39,20 +39,20 @@ const dashboardRoutes = [
     component: Dashboard,
     layout: "/admin"
   },
-  {
-    path: "/user",
-    name: "Mi perfil",
-    icon: "pe-7s-user",
-    component: UserProfile,
-    layout: "/admin"
-  },
-  {
-    path: "/table",
-    name: "Lista Usuarios",
-    icon: "pe-7s-note2",
-    component: TableList,
-    layout: "/admin"
-  },
+  // {
+  //   path: "/user",
+  //   name: "Mi perfil",
+  //   icon: "pe-7s-user",
+  //   component: UserProfile,
+  //   layout: "/admin"
+  // },
+  // {
+  //   path: "/table",
+  //   name: "Lista Usuarios",
+  //   icon: "pe-7s-note2",
+  //   component: TableList,
+  //   layout: "/admin"
+  // },
   
   // {
   //   path: "/icons",

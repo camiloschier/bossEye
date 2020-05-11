@@ -1,12 +1,43 @@
+html {
+    font-size: 14px !important;
+  }
+.react-datepicker-ignore-onclickoutside{
+    padding: 5px;
+}
+
+.detalleEventos .card .header{
+    display:none
+}
 .tarjeta-detalles{
     display:flex;
-
+    
+    white-space: nowrap;
+    overflow: hidden;
 }
 .tarjeta-detalles-texto{
-    width: 80%;
+   width: 60%;  
 }
-.tarjeta-detalles-imagen{
-    height: 100px;
-    width: 100px;
-    background-color: blue;
+.tarjeta-detalles-texto:last-child{
+    margin-left: 10px;
+    width: 40%;
 }
+.tarjeta-detalles-texto-titulo{
+    overflow: hidden;
+}
+.tarjeta-detalles-texto-iconos span:first-child{
+    margin-left: 0px;
+}
+.tarjeta-detalles-texto-iconos span{
+    margin-left: 30px;
+}
+/* Breakpoint pantallas chicas */
+@media only screen and (min-width: 1300px) {
+    
+    .tarjeta-detalles{
+        display:flex;
+        justify-content: space-evenly;
+        
+    }
+    
+}
+
