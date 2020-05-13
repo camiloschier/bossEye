@@ -41,11 +41,11 @@ import {
 registerLocale("es", es);
 
 var moment = require('moment');
-var dataPie = {
+let dataPie = {
   labels: ["40%", "50%", "10%"],
   series: [40, 50, 10]
 };
-var legendPie = {
+let legendPie = {
   names: ["Tarea", "Distraccion", "Comunicacion"],
   types: ["info", "danger", "warning"]
 };
@@ -104,18 +104,48 @@ class Dashboard extends Component {
   };
 
   componentDidMount(){
-    this.peticionApi();
-    //this.getDatosDiarios();
+    //this.peticionApi();
+    this.getDatosDiarios();
     //this.getDatosHora();
   }
 
-  getDatosDiarios(fecha){
-    let fechaActual = moment(fecha).format("YYYY-MM-DD");
+  // Refactor
+  async getDatosDiarios(){
+    let fechaActual = moment().subtract(1,'d').format("YYYY-MM-DD");
+    console.log(fechaActual)
+    let arrayDatos = await this.peticionApi(fechaActual)
 
-    //console.log("FECHA ACTUAL", fechaActual)
-
-    this.peticionApiPorFecha(fechaActual);
+    //tengo el array y ahora lo necesito convertir a el objeto para los graficos
   }
+
+
+
+  peticionApi(fecha){
+
+    let datosArray = []
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/00:00:00/"+fecha+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    
+    const fetchData = fetch(url)
+      .then(res => res.json())
+      .then((data) => {
+        return data
+      })
+      .catch(console.log);
+
+    return fetchData
+    
+  }
+
+
+
+
+  // getDatosDiarios(fecha){
+  //   let fechaActual = moment(fecha).format("YYYY-MM-DD");
+
+  //   //console.log("FECHA ACTUAL", fechaActual)
+
+  //   this.peticionApiPorFecha(fechaActual);
+  // }
 
   getDatosHora(){
     let fechaActual = moment("05/10/2020").format("YYYY-MM-DD");
@@ -124,7 +154,7 @@ class Dashboard extends Component {
     console.log("HORA ACTUAL",horaActualMasUno);
     this.peticionApiPorHora(fechaActual,horaActual,horaActualMasUno)
   }
-  peticionApi() {
+  peticionApiAnterior() {
     //ESTA ME DA EL DEL DIA ANTERIOR
     let fecha = moment().subtract(1,'d').format("YYYY-MM-DD");
     console.log("FECHA", fecha)
