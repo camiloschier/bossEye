@@ -4,6 +4,33 @@ html {
 .react-datepicker-ignore-onclickoutside{
     padding: 5px;
 }
+.dashboard .card .header {
+    display: none;
+}
+
+.dashboard .card .footer {
+    display: none;
+}
+
+.dashboard .card .ct-chart{
+    margin: 0px;
+    width: auto;
+    
+}
+
+.titulo-reporte{
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 300;
+    margin-bottom: 0px;
+}
+
+.nombre-usuario-reporte{
+    font-size: 1em;
+    font-weight: 400;
+    color: #9A9A9A;
+    margin-bottom: 15px
+}
 
 .detalleEventos .card .header{
     display:none

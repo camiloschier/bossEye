@@ -59,6 +59,7 @@ class Dashboard extends Component {
 
       //DatePicker
       startDate: new Date(),
+      isLoaded: false,
     }
   }
  
@@ -66,11 +67,14 @@ class Dashboard extends Component {
     var legend = [];
     for (var i = 0; i < json["names"].length; i++) {
       var type = "fa fa-circle text-" + json["types"][i];
-      legend.push(<i className={type} key={i} />);
-      legend.push(" ");
-      legend.push(json["names"][i]);
+      legend.push(<i className={type} key={i} />," ",json["names"][i]);
+      // legend.push(" ");
+      // legend.push(json["names"][i]);
     }
+
+    console.log("LEYENDA", legend)
     return legend;
+
   }
   
   handleChange = date => {
@@ -80,7 +84,7 @@ class Dashboard extends Component {
   };
 
   componentDidMount(){
-    //this.peticionApi();
+    
     this.getDatosDiarios();
     //this.getDatosHora();
 
@@ -128,7 +132,7 @@ class Dashboard extends Component {
       cantidades.push(pruebas.length)
     }
 
-    // console.log("Etiquetas", etiquetas);
+    console.log("Etiquetas", etiquetas);
     // console.log("Cantidades", cantidades);
 
     //cuento cuantos items hay en todo el arreglo
@@ -139,21 +143,42 @@ class Dashboard extends Component {
     //calculo el porcentaje que representa cada elemento del array 
     let etiquetasPorcentaje = []
     cantidades.forEach(item => etiquetasPorcentaje.push(item*100/sumaCantidades))
-    //console.log("Etiquetas porcentaje", etiquetasPorcentaje)
-
-    let objetoDatos = {
+    
+    let objetoDatosDiarios = {
       labels: etiquetasPorcentaje,
       series: cantidades
     };
 
-    // let legendPie = {
-    //   names: ["Tarea", "Distraccion", "Comunicacion"],
-    //   types: ["info", "danger", "warning"]
-    // };
+    let legendDatosDiarios = {
+      names: etiquetas,
+      types: ["info", "danger", "warning"]
+    };
 
+    console.log("objetoDatosDiarios", objetoDatosDiarios)
+
+
+    this.setState({objetoDatosDiarios: objetoDatosDiarios, legendDatosDiarios: legendDatosDiarios, isLoaded:true})
+
+  }
+
+  async getDatosHora(){
+    let fechaActual = moment().subtract(3,'d').format("YYYY-MM-DD");
+    console.log(fechaActual)
+    let arrayDatos = await this.peticionApi(fechaActual);
+
+    console.log(arrayDatos)
+    //divido el array en 60
+    let horasEnArray = Math.floor(arrayDatos.length / 60)
+
+    console.log(horasEnArray)
     
-    return objetoDatos
+    for (let index = 0; index < horasEnArray; index++) {
+      let arrayDatosHora = arrayDatos.slice(0,59)
+      console.log("ARRAY HORA", arrayDatosHora)
 
+      //a partir de esto genero las etiquetas y labels necesarios
+      //devuelvo para a partir de eso generar los reportes de cada una
+    }
   }
 
   peticionApi(fecha){
@@ -174,11 +199,13 @@ class Dashboard extends Component {
 
   render() {
     return (
-      <div className="content">
+      <div className="content dashboard">
         <Grid fluid>
         
-        {  
-          this.state.datosApi.length > 0 ?
+        { 
+          
+          this.state.isLoaded ?
+          
           <>
           <Row>
               <Col md={3}>
@@ -206,133 +233,288 @@ class Dashboard extends Component {
 
               />
               </Col>
-          </Row>
-          <Row>   
-            <Col md={4}>
+          {/* </Row>
+          <Row>    */}
+            <Col md={6}>
               <Card
                 
                 title="Usuario: Camilo Perona"
-                showTitle={true}
-                category="Reporte Diario Total"
+                // showTitle={true}
+                // category="Reporte Diario Total"
                 // statsIcon="fa fa-clock-o"
                 // stats="Campaign sent 2 days ago"
                 content={
-                  <div
-                    id="chartPreferences"
-                    className="ct-chart ct-perfect-fourth"
-                  >
-                    
-                    <ChartistGraph data={this.getDatosDiarios} type="Pie"/>
+                  <>
+                  <div style={{display:'flex', justifyContent:'center'}}>
+                    <div>
+                      <div className="titulo-reporte">Reporte Diario</div>
+                      <div className="nombre-usuario-reporte">Usuario: Camilo Perona </div>
+                      <div style={{display:'flex',flexDirection:'column'}}>{this.createLegend(this.state.legendDatosDiarios)}</div>
+                    </div>
+                      
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={this.state.objetoDatosDiarios} type="Pie"/>
+                      {/* {this.createLegend(this.state.legendDatosDiarios)} */}
+                    </div>
                   </div>
+                  </>
                 }
-                legend={
-                  <div className="legend">{this.createLegend(this.state.objetoLeyenda)}</div>
-                }
+                // legend={
+                //   <div className="legend">{this.createLegend(this.state.legendDatosDiarios)}</div>
+                // }
                 showFooter={true}
               />
               
             </Col>
-            <Col md={4}>
-              <Card
+            </Row>
+            <Row>
+              <Col md={12}>
+              <Col md={12}>
+                  <div>
+                      <div className="titulo-reporte">Reporte por horas</div>
+                      <div className="nombre-usuario-reporte">Usuario: Camilo Perona </div>
+                  </div>
+                <Card
                 
-                title="Usuario: Camilo Perona"
-                showTitle={true}
-                category="Reporte Por hora"
+                // title="Usuario: Camilo Perona"
+                // showTitle={true}
+                // category="Reportes Por hora"
                 // statsIcon="fa fa-clock-o"
                 // stats="Campaign sent 2 days ago"
                 content={
-                  <div
-                    id="chartPreferences"
-                    className="ct-chart ct-perfect-fourth"
-                  >
+                  <>
+                  <div style={{display:'flex', flexWrap:'wrap', justifyContent:'space-evenly'}}>
+                  <Card
+                  
+                  title="Usuario: Camilo Perona"
+                  showTitle={true}
+                  category="Reporte Por hora"
+                  // statsIcon="fa fa-clock-o"
+                  // stats="Campaign sent 2 days ago"
+                  content={
+                    <div style={{display:'flex', justifyContent:'center'}}>
                     
-                    <ChartistGraph data={dataPie} type="Pie"/>
-                  </div>
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={dataPie} type="Pie"/>
+                    </div>
+                    </div>
+                  }
+                  
+                />
+                <Card
+                  
+                  title="Usuario: Camilo Perona"
+                  showTitle={true}
+                  category="Reporte Por hora"
+                  // statsIcon="fa fa-clock-o"
+                  // stats="Campaign sent 2 days ago"
+                  content={
+                    <div style={{display:'flex', justifyContent:'center'}}>
+                    
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={dataPie} type="Pie"/>
+                    </div>
+                    </div>
+                  }
+                  
+                />
+                <Card
+                  
+                  title="Usuario: Camilo Perona"
+                  showTitle={true}
+                  category="Reporte Por hora"
+                  // statsIcon="fa fa-clock-o"
+                  // stats="Campaign sent 2 days ago"
+                  content={
+                    <div style={{display:'flex', justifyContent:'center'}}>
+                    
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={dataPie} type="Pie"/>
+                    </div>
+                    </div>
+                  }
+                  legend={
+                    <div className="legend">{this.createLegend(legendPie)}</div>
+                  }
+                  showFooter={true}
+                />
+                <Card
+                  
+                  title="Usuario: Camilo Perona"
+                  showTitle={true}
+                  category="Reporte Por hora"
+                  // statsIcon="fa fa-clock-o"
+                  // stats="Campaign sent 2 days ago"
+                  content={
+                    <div style={{display:'flex', justifyContent:'center'}}>
+                    
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={dataPie} type="Pie"/>
+                    </div>
+                    </div>
+                  }
+                  legend={
+                    <div className="legend">{this.createLegend(legendPie)}</div>
+                  }
+                  showFooter={true}
+                />
+                <Card
+                  
+                  title="Usuario: Camilo Perona"
+                  showTitle={true}
+                  category="Reporte Por hora"
+                  // statsIcon="fa fa-clock-o"
+                  // stats="Campaign sent 2 days ago"
+                  content={
+                    <div style={{display:'flex', justifyContent:'center'}}>
+                    
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={dataPie} type="Pie"/>
+                    </div>
+                    </div>
+                  }
+                  legend={
+                    <div className="legend">{this.createLegend(legendPie)}</div>
+                  }
+                  showFooter={true}
+                />
+                <Card
+                  
+                  title="Usuario: Camilo Perona"
+                  showTitle={true}
+                  category="Reporte Por hora"
+                  // statsIcon="fa fa-clock-o"
+                  // stats="Campaign sent 2 days ago"
+                  content={
+                    <div style={{display:'flex', justifyContent:'center'}}>
+                    
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={dataPie} type="Pie"/>
+                    </div>
+                    </div>
+                  }
+                  legend={
+                    <div className="legend">{this.createLegend(legendPie)}</div>
+                  }
+                  showFooter={true}
+                />
+                <Card
+                  
+                  title="Usuario: Camilo Perona"
+                  showTitle={true}
+                  category="Reporte Por hora"
+                  // statsIcon="fa fa-clock-o"
+                  // stats="Campaign sent 2 days ago"
+                  content={
+                    <div style={{display:'flex', justifyContent:'center'}}>
+                    
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={dataPie} type="Pie"/>
+                    </div>
+                    </div>
+                  }
+                  legend={
+                    <div className="legend">{this.createLegend(legendPie)}</div>
+                  }
+                  showFooter={true}
+                />
+                <Card
+                  
+                  title="Usuario: Camilo Perona"
+                  showTitle={true}
+                  category="Reporte Por hora"
+                  // statsIcon="fa fa-clock-o"
+                  // stats="Campaign sent 2 days ago"
+                  content={
+                    <div style={{display:'flex', justifyContent:'center'}}>
+                    
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={dataPie} type="Pie"/>
+                    </div>
+                    </div>
+                  }
+                  legend={
+                    <div className="legend">{this.createLegend(legendPie)}</div>
+                  }
+                  showFooter={true}
+                />
+                <Card
+                  
+                  title="Usuario: Camilo Perona"
+                  showTitle={true}
+                  category="Reporte Por hora"
+                  // statsIcon="fa fa-clock-o"
+                  // stats="Campaign sent 2 days ago"
+                  content={
+                    <div style={{display:'flex', justifyContent:'center',}}>
+                    
+                    <div
+                      id="chartPreferences"
+                      className="ct-chart ct-perfect-fourth"
+                    >
+                      
+                      <ChartistGraph data={dataPie} type="Pie"/>
+                    </div>
+                    </div>
+                  }
+                  legend={
+                    <div className="legend">{this.createLegend(legendPie)}</div>
+                  }
+                  showFooter={true}
+                />
+                </div>
+                </>
                 }
                 legend={
                   <div className="legend">{this.createLegend(legendPie)}</div>
                 }
                 showFooter={true}
-              />
-            </Col>
+                />
+                
+                
+              </Col>
+              </Col>
             </Row>
             </>
             :
             "CARGANDO"
-   }
-            {/* <Col md={4}>
-              <Card
-                
-                title="Usuario: Camilo Perona"
-                category="Performance"
-                // statsIcon="fa fa-clock-o"
-                // stats="Campaign sent 2 days ago"
-                content={
-                  <div
-                    id="chartPreferences"
-                    className="ct-chart ct-perfect-fourth"
-                  >
-                    <ChartistGraph data={dataPie} type="Pie" />
-                  </div>
-                }
-                legend={
-                  <div className="legend">{this.createLegend(legendPie)}</div>
-                }
-                showFooter={true}
-              />
-            </Col> */}
-            
-          
-          {/* <Row>
-            
-            <Col md={3}>
-              <Card
-              
-              content={
-                <FormInputs
-                      ncols={["col-md-12"]}
-                      properties={[
-                        {
-                          label: "Fecha",
-                          type: "text",
-                          bsClass: "form-control",
-                          placeholder: "Buscar usuario..",
-                          
-                        }
-                        
-                      ]}
-                    />
-              }
-
-              />
-            </Col>
-            <Col md={3}>
-              <Card
-              
-              content={
-                <FormInputs
-                      ncols={["col-md-12"]}
-                      properties={[
-                        {
-                          label: "Hora desde",
-                          type: "text",
-                          bsClass: "form-control",
-                          placeholder: "Buscar usuario..",
-                          
-                        }
-                        
-                      ]}
-                    />
-                    
-                    
-              }
-
-              />
-            </Col>
-          </Row> */}
-          
-
-          
+          }
         </Grid>
       </div>
     );
