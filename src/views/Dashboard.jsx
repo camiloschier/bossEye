@@ -57,30 +57,6 @@ class Dashboard extends Component {
       //Estos son objetos del dia
       datosApi: [],
 
-      objetoDatos: {
-        labels: [],
-        series: []
-      },
-      objetoLeyenda:{
-        names: [],
-        types: ["info","danger","warning"]
-      },
-      //Terminan objetos del dia
-      datosApiHora: [],
-      // tiposEtiquetas:[],
-      // datosEtiquetas:[],
-      //Estos son objetos de la hora
-      objetoDatosHora: {
-        labels: [],
-        series: []
-      },
-      objetoLeyendaHora:{
-        names: [],
-        types: ["info","danger","warning"]
-      },
-      //Terminan objetos de la hora
-  
-
       //DatePicker
       startDate: new Date(),
     }
@@ -107,18 +83,78 @@ class Dashboard extends Component {
     //this.peticionApi();
     this.getDatosDiarios();
     //this.getDatosHora();
+
   }
 
   // Refactor
   async getDatosDiarios(){
-    let fechaActual = moment().subtract(1,'d').format("YYYY-MM-DD");
+    let fechaActual = moment().subtract(3,'d').format("YYYY-MM-DD");
     console.log(fechaActual)
     let arrayDatos = await this.peticionApi(fechaActual)
 
     //tengo el array y ahora lo necesito convertir a el objeto para los graficos
+
+    let etiquetas = []
+
+    for (let index = 0; index < arrayDatos.length; index++) {
+      const element = arrayDatos[index];
+
+      let calificacion = element.calificacion;
+      let valor = 1;
+      //chequeo si el elemento está en el array, si no está lo añado
+      if (!etiquetas.includes(element.calificacion)) {
+        if (element.calificacion == null) {
+          element.calificacion = "Desconocido"
+          
+          if(etiquetas.indexOf("Desconocido") == -1)
+            {
+              etiquetas.push(element.calificacion)
+            }
+        }
+        else{
+          etiquetas.push(element.calificacion)
+        }
+        
+      }
+    }
+    //el array etiquetas queda cargado con las etiquetas
+
+    let cantidades =[]
+    //2do recorro el array original y cuento cantidades
+    for (let index = 0; index < etiquetas.length; index++) {
+      // console.log("ETIQUETA ES", etiquetas[index])
+      let pruebas = arrayDatos.filter(elem => elem.calificacion == etiquetas[index])
+      
+      cantidades.push(pruebas.length)
+    }
+
+    // console.log("Etiquetas", etiquetas);
+    // console.log("Cantidades", cantidades);
+
+    //cuento cuantos items hay en todo el arreglo
+    let sumaCantidades = 0;
+    cantidades.forEach(item => sumaCantidades += item)
+    // console.log("Cantidad items",sumaCantidades)
+
+    //calculo el porcentaje que representa cada elemento del array 
+    let etiquetasPorcentaje = []
+    cantidades.forEach(item => etiquetasPorcentaje.push(item*100/sumaCantidades))
+    //console.log("Etiquetas porcentaje", etiquetasPorcentaje)
+
+    let objetoDatos = {
+      labels: etiquetasPorcentaje,
+      series: cantidades
+    };
+
+    // let legendPie = {
+    //   names: ["Tarea", "Distraccion", "Comunicacion"],
+    //   types: ["info", "danger", "warning"]
+    // };
+
+    
+    return objetoDatos
+
   }
-
-
 
   peticionApi(fecha){
 
@@ -134,177 +170,6 @@ class Dashboard extends Component {
 
     return fetchData
     
-  }
-
-
-
-
-  // getDatosDiarios(fecha){
-  //   let fechaActual = moment(fecha).format("YYYY-MM-DD");
-
-  //   //console.log("FECHA ACTUAL", fechaActual)
-
-  //   this.peticionApiPorFecha(fechaActual);
-  // }
-
-  getDatosHora(){
-    let fechaActual = moment("05/10/2020").format("YYYY-MM-DD");
-    let horaActual = moment("05/10/2020 16:30").format("HH:mm:ss");
-    let horaActualMasUno = moment("05/10/2020 16:30").add(1, 'h').format("HH:mm:ss");
-    console.log("HORA ACTUAL",horaActualMasUno);
-    this.peticionApiPorHora(fechaActual,horaActual,horaActualMasUno)
-  }
-  peticionApiAnterior() {
-    //ESTA ME DA EL DEL DIA ANTERIOR
-    let fecha = moment().subtract(1,'d').format("YYYY-MM-DD");
-    console.log("FECHA", fecha)
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/00:00:00/"+fecha+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
-    fetch(url)
-        .then(res => res.json())
-        .then((data) => {
-          this.setState({ datosApi: data })
-          
-        })
-        .then( (datos) => {console.log("DATOS HORA",this.state.datosApiHora)})
-        .then(() => this.obtenerEtiquetas())
-        .catch(console.log)
-    
-  }
-  peticionApiPorFecha(fecha) {
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/00:00:00/"+fecha+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
-    fetch(url)
-        .then(res => res.json())
-        .then((data) => {
-          this.setState({ datosApi: data })
-          
-        })
-        .then( (datos) => {console.log("DATOS HORA",this.state.datosApiHora)})
-        .then(() => this.obtenerEtiquetas())
-        .catch(console.log)
-    
-  }
-
-  peticionApiPorHora(fecha,horaDesde, horaHasta){
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/"+horaDesde+"/"+fecha+"/"+horaHasta+"/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
-    fetch(url)
-        .then(res => res.json())
-        .then((data) => {
-          this.setState({ datosApi: data })
-          
-        })
-        .then( (datos) => {console.log("DATOS",this.state.datosApiHora)})
-        // .then(() => this.obtenerEtiquetas())
-        .catch(console.log)
-    
-  }
-
-  //ESTE OBTIENE ETIQUETAS DEL DIA
-  obtenerEtiquetas(){
-    //1ero recorro el array y añado etiquetas
-    let etiquetas = []
-
-    
-
-    for (let index = 0; index < this.state.datosApi.length; index++) {
-      const element = this.state.datosApi[index];
-
-      let calificacion = element.calificacion;
-      let valor = 1
-      //chequeo si el elemento está en el array, si no está lo añado
-      if (!etiquetas.includes(element.calificacion)) {
-        if (element.calificacion == null) {
-          element.calificacion = "Desconocido"
-          
-          if(etiquetas.indexOf("Desconocido") == -1)
-            {
-              etiquetas.push(element.calificacion)
-            }
-        }
-        else{
-          etiquetas.push(element.calificacion)
-        }
-        
-      }
-    }
-    //el array etiquetas queda cargado con las etiquetas
-    
-    this.setState({tiposEtiquetas: etiquetas})
-
-    
-    this.calcularCantidades(etiquetas)
-  }
-
-
-  //ESTE CALCULA CANTIDADES PARA EL DIA
-  calcularCantidades(etiquetas){
-    
-    let cantidades =[]
-    //2do recorro el array original y cuento cantidades
-    for (let index = 0; index < etiquetas.length; index++) {
-      // console.log("ETIQUETA ES", etiquetas[index])
-      let pruebas = this.state.datosApi.filter(elem => elem.calificacion == etiquetas[index])
-      
-      cantidades.push(pruebas.length)
-    }
-
-    this.setState({datosEtiquetas: cantidades})
-
-    //ETIQUETAS Y CANTIDADES ESTAN EN EL MISMO ORDEN
-  
-
-    //SETEO EL STATE DE: ObjetoDatos y ObjetoLeyenda
-    this.setState({
-      objetoDatos:{
-        ...this.state.objetoDatos,
-        labels: etiquetas,
-        series: cantidades
-      },
-      objetoLeyenda:{
-        ...this.state.objetoLeyenda,
-        names: etiquetas
-      }
-    })
-
-    console.log(this.state.objetoDatos)
-
-    
-  }
-
-
-  //ESTOS OBTIENEN ETIQUETAS HORA
-  obtenerEtiquetasHora(){
-    //1ero recorro el array y añado etiquetas
-    let etiquetas = []
-
-    
-
-    for (let index = 0; index < this.state.datosApiHora.length; index++) {
-      const element = this.state.datosApi[index];
-
-      let calificacion = element.calificacion;
-      let valor = 1
-      //chequeo si el elemento está en el array, si no está lo añado
-      if (!etiquetas.includes(element.calificacion)) {
-        if (element.calificacion == null) {
-          element.calificacion = "Desconocido"
-          
-          if(etiquetas.indexOf("Desconocido") == -1)
-            {
-              etiquetas.push(element.calificacion)
-            }
-        }
-        else{
-          etiquetas.push(element.calificacion)
-        }
-        
-      }
-    }
-    //el array etiquetas queda cargado con las etiquetas
-    
-    this.setState({tiposEtiquetas: etiquetas})
-
-    
-    this.calcularCantidades(etiquetas)
   }
 
   render() {
@@ -357,7 +222,7 @@ class Dashboard extends Component {
                     className="ct-chart ct-perfect-fourth"
                   >
                     
-                    <ChartistGraph data={this.state.objetoDatos} type="Pie"/>
+                    <ChartistGraph data={this.getDatosDiarios} type="Pie"/>
                   </div>
                 }
                 legend={
@@ -365,7 +230,6 @@ class Dashboard extends Component {
                 }
                 showFooter={true}
               />
-              {/* {this.calcularEstadistica()} */}
               
             </Col>
             <Col md={4}>
