@@ -41,7 +41,12 @@ import {
   legendBar
 } from "variables/Variables.jsx";
 registerLocale("es", es);
-
+let data = [
+  {
+    uv: 4000, pv: 2400, amt: 2400
+  },
+  
+];
 var createReactClass = require('create-react-class');
 const CustomizedLabel = createReactClass({
     
@@ -58,12 +63,7 @@ const CustomizedLabel = createReactClass({
   }
 });
 
-const data = [
-  {
-    uv: 4000, pv: 2400, amt: 2400,
-  },
-  
-];
+
 
 
 var moment = require('moment');
@@ -200,12 +200,22 @@ class Dashboard extends Component {
   }
   
   async getDatosHora(fecha){
-    console.log("Se ejecuto getdatoshras")
+    //MODIFICAR FUNCION PARA QUE A PARTIR DE LA HORA INICIO Y HORA FIN CALCULE LAS HORAS Y CICLE CADA UNA HORA DE ESO
+   
     let fechaActual = moment(fecha).format("YYYY-MM-DD");
+    console.log("Se ejecuto getdatoshras en fecha",moment(fecha).format("HH:mm"))
     console.log(fechaActual)
     let arrayDatos = await this.peticionApi(fechaActual);
+    //a partir de aca calculo diferencia entre las horas
+    
+    let primerHora = moment(arrayDatos[0].fecha).format("HH:mm")
+    console.log("Primer hora",primerHora)
+    let ultimaHora = moment(arrayDatos[arrayDatos.length-1].fecha).format("HH:mm")
+    
+    console.log("Ultima hora",ultimaHora)
 
-    console.log(arrayDatos)
+    
+    console.log("arrayDatos",arrayDatos)
     //divido el array en 60
     let horasEnArray = Math.ceil(arrayDatos.length / 60)
     
@@ -272,6 +282,7 @@ class Dashboard extends Component {
         labels: etiquetasPorcentaje,
         series: cantidades
       };
+      console.log("Objeto datos hora", objetoDatosHora)
   
       let legendDatosHora = {
         names: etiquetas,
@@ -290,6 +301,32 @@ class Dashboard extends Component {
 
 
       }
+  }
+
+  renderHora2(){
+
+    let data = [
+      {
+        uv: 4000, pv: 2400, amt: 2400,
+      },
+      
+    ];
+
+      // <BarChart
+      //   width={300}
+      //   height={100}
+      //   data={data}
+       
+      //   layout="vertical" 
+      // >
+      //   <XAxis type="number" hide="true"/>
+      //   <YAxis type="category" dataKey="name" hide="true"/>
+      //   <Tooltip />
+      //   {/* <Legend /> */}
+      //   <Bar dataKey="pv"  stackId="a" fill="#8884d8" />
+      //   <Bar dataKey="amt" stackId="a" fill="#82ca9d" />
+      //   <Bar dataKey="uv" stackId="a" fill="#ffc658" />
+      // </BarChart>
   }
 
   renderHora(objetoData,leyendaData, horaInicio, horaFin, key){
@@ -359,27 +396,13 @@ class Dashboard extends Component {
     
   }
 
+  
+
+
   render() {
     return (
       <div className="content dashboard">
-        <BarChart
-        width={300}
-        height={100}
-        data={data}
-        margin={{
-          top: 20, right: 30, left: 20, bottom: 5,
-        }}
-        layout="vertical" barCategoryGap={1}
-      >
-        {/* <CartesianGrid strokeDasharray="3 3" /> */}
-        <XAxis type="number" />
-        <YAxis type="category" dataKey="name"/>
-        <Tooltip />
-        {/* <Legend /> */}
-        <Bar dataKey="pv"  stackId="a" fill="#8884d8" />
-        <Bar dataKey="amt" stackId="a" fill="#82ca9d" />
-        <Bar dataKey="uv" stackId="a" fill="#ffc658" />
-      </BarChart>
+        
         <Grid fluid>
         
         { 
