@@ -29,7 +29,7 @@ class DetalleEventos extends Component {
       detalle: [],
       startDate: new Date(),
       show: false,
-      linkFotos:"http://160.160.160.27/fotos/ftp/",
+      linkFotos:"http://192.168.0.103/fotos/ftp/",
       urlFotos: "",
   
     }
@@ -38,8 +38,26 @@ class DetalleEventos extends Component {
   
   
   componentDidMount(){
+    
+    
     this.peticionApi();
   }
+
+  obtenerURLfotos(){
+    //var fechaHoy = moment().format("YYYY-MM-DD");
+    
+    var url = "http://chaco.teledirecto.com:3003/login/juanm/011c945f30ce2cbafc452f39840f025693339c42/s"
+    fetch(url)
+        .then(res => res.json())
+        .then((data) => {
+          console.log("DATOS API SESION", data)
+          this.setState({urlFotos: data.link_fotos})
+          
+        })
+        .catch(console.log)
+    
+  }
+
   handleChange = date => {
     this.setState({
       startDate: date
@@ -48,7 +66,9 @@ class DetalleEventos extends Component {
   
   
   peticionApi(params) {
-    var url = "http://chaco.teledirecto.com:3003/tdr/2020-05-07/15:00:00/2020-05-07/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    var fechaHoy = moment().format("YYYY-MM-DD");
+    
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fechaHoy+"/00:00:00/"+fechaHoy+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
     fetch(url)
         .then(res => res.json())
         .then((data) => {
@@ -56,7 +76,7 @@ class DetalleEventos extends Component {
           
         })
         .catch(console.log)
-    
+    this.obtenerURLfotos();
   }
 
   getDetallesPorFecha(fechaDesde){

@@ -94,22 +94,24 @@ class Dashboard extends Component {
   };
 
   componentDidMount(){
-    
-    this.getDatosDiarios();
-    this.getDatosHora();
+    let fecha = moment().format("YYYY-MM-DD");
+    this.getDatosDiarios(fecha);
+    this.getDatosHora(fecha);
     //this.cargarChart();
-
+    //this.buscarPorFecha(fecha)
   }
 
-  async cargarChart(){
-
+  buscarPorFecha(fecha){
+    this.setState({elementosHora:[]})
+    this.getDatosDiarios(fecha);
+    this.getDatosHora(fecha);
 
   }
 
   // Refactor
-  async getDatosDiarios(){
+  async getDatosDiarios(fecha){
     
-    let fechaActual = moment().subtract(3,'d').format("YYYY-MM-DD");
+    let fechaActual = moment(fecha).format("YYYY-MM-DD");
     console.log(fechaActual)
     let arrayDatos = await this.peticionApi(fechaActual)
 
@@ -159,7 +161,7 @@ class Dashboard extends Component {
 
     //calculo el porcentaje que representa cada elemento del array 
     let etiquetasPorcentaje = []
-    cantidades.forEach(item => etiquetasPorcentaje.push(String(item*100/sumaCantidades)+"%"))
+    cantidades.forEach(item => etiquetasPorcentaje.push(String(Math.round(item*100/sumaCantidades))+"%"))
     
     let objetoDatosDiarios = {
       labels: etiquetasPorcentaje,
@@ -178,8 +180,8 @@ class Dashboard extends Component {
 
   }
   
-  async getDatosHora(){
-    let fechaActual = moment().subtract(3,'d').format("YYYY-MM-DD");
+  async getDatosHora(fecha){
+    let fechaActual = moment(fecha).format("YYYY-MM-DD");
     console.log(fechaActual)
     let arrayDatos = await this.peticionApi(fechaActual);
 
@@ -239,7 +241,7 @@ class Dashboard extends Component {
 
       //calculo el porcentaje que representa cada elemento del array 
       let etiquetasPorcentaje = []
-      cantidades.forEach(item => etiquetasPorcentaje.push(String(item*100/sumaCantidades)+"%"))
+      cantidades.forEach(item => etiquetasPorcentaje.push(String(Math.round(item*100/sumaCantidades))+"%"))
       console.log("Cantidades", cantidades);
       console.log("Etiquetas Porcentaje", etiquetasPorcentaje);
 
@@ -271,7 +273,7 @@ class Dashboard extends Component {
   }
 
   renderHora(objetoData,leyendaData, horaInicio, horaFin){
-
+    
     this.state.elementosHora.push(
       <Col md={4} lg={3}>
       <div
@@ -364,7 +366,7 @@ class Dashboard extends Component {
                       dateFormat="MMMM d, yyyy "
                   />
                   <hr/>
-                  <Button variant="primary" style={{marginLeft:'10px'}} onClick={() => this.getDatosDiarios(this.state.startDate)}>
+                  <Button variant="primary" style={{marginLeft:'10px'}} onClick={() => this.buscarPorFecha(this.state.startDate)}>
                     BUSCAR POR FECHA
                   </Button>
                   
