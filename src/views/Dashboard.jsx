@@ -23,12 +23,11 @@ import { Card } from "components/Card/Card.jsx";
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
 import { Tasks } from "components/Tasks/Tasks.jsx";
 import DatePicker, { registerLocale } from "react-datepicker";
-import es from "date-fns/locale/es"; // the locale you want
-
-
-
-
 import "react-datepicker/dist/react-datepicker.css";
+import es from "date-fns/locale/es"; // the locale you want
+import {
+  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+} from 'recharts';
 
 import {
   
@@ -43,7 +42,28 @@ import {
 } from "variables/Variables.jsx";
 registerLocale("es", es);
 
+var createReactClass = require('create-react-class');
+const CustomizedLabel = createReactClass({
+    
+  render () {
+    const {x, y, fill, value,color} = this.props;
+   	return <text 
+               x={x} 
+               y={y} 
 
+               fontSize='16' 
+               fontFamily='sans-serif'
+               fill={color}
+               textAnchor="start">{value}%</text>
+  }
+});
+
+const data = [
+  {
+    uv: 4000, pv: 2400, amt: 2400,
+  },
+  
+];
 
 
 var moment = require('moment');
@@ -107,10 +127,9 @@ class Dashboard extends Component {
     this.getDatosHora(fecha);
 
   }
-
   // Refactor
   async getDatosDiarios(fecha){
-    
+    console.log("Se ejecuto getdatosdiarios")
     let fechaActual = moment(fecha).format("YYYY-MM-DD");
     console.log(fechaActual)
     let arrayDatos = await this.peticionApi(fechaActual)
@@ -181,6 +200,7 @@ class Dashboard extends Component {
   }
   
   async getDatosHora(fecha){
+    console.log("Se ejecuto getdatoshras")
     let fechaActual = moment(fecha).format("YYYY-MM-DD");
     console.log(fechaActual)
     let arrayDatos = await this.peticionApi(fechaActual);
@@ -257,8 +277,8 @@ class Dashboard extends Component {
         names: etiquetas,
         types: ["info", "danger", "warning"]
       };
-
-      this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0] .fecha.substr(11,8))
+      let key = index
+      this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0] .fecha.substr(11,8),key)
 
 
 
@@ -272,10 +292,10 @@ class Dashboard extends Component {
       }
   }
 
-  renderHora(objetoData,leyendaData, horaInicio, horaFin){
+  renderHora(objetoData,leyendaData, horaInicio, horaFin, key){
     
     this.state.elementosHora.push(
-      <Col md={4} lg={3}>
+      <Col md={4} lg={3} key={key}>
       <div
         id="chartPreferences"
         className="ct-chart ct-perfect-fourth"
@@ -342,6 +362,24 @@ class Dashboard extends Component {
   render() {
     return (
       <div className="content dashboard">
+        <BarChart
+        width={300}
+        height={100}
+        data={data}
+        margin={{
+          top: 20, right: 30, left: 20, bottom: 5,
+        }}
+        layout="vertical" barCategoryGap={1}
+      >
+        {/* <CartesianGrid strokeDasharray="3 3" /> */}
+        <XAxis type="number" />
+        <YAxis type="category" dataKey="name"/>
+        <Tooltip />
+        {/* <Legend /> */}
+        <Bar dataKey="pv"  stackId="a" fill="#8884d8" />
+        <Bar dataKey="amt" stackId="a" fill="#82ca9d" />
+        <Bar dataKey="uv" stackId="a" fill="#ffc658" />
+      </BarChart>
         <Grid fluid>
         
         { 
@@ -440,6 +478,7 @@ class Dashboard extends Component {
             :
             "CARGANDO"
         }
+
         </Grid>
       </div>
     );

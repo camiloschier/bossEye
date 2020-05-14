@@ -216,7 +216,7 @@ class DetalleEventos extends Component {
             <Row>
 
               {this.state.detalle.map(det =>
-              <Col md={12}>
+              <Col md={12} key={det.id}>
                    <Card
                     // title={this.localizarFecha(det.fecha,det.zona_h,'HH:mm')+" - "+ det.aplicacion}
                     // category="Created using Roboto Font Family"
@@ -230,9 +230,9 @@ class DetalleEventos extends Component {
                         <p data-tip={det.titulo} className="tarjeta-detalles-texto-titulo">Titulo: {(det.titulo)}</p>
                         <ReactTooltip />
                         <p className="tarjeta-detalles-texto-iconos">
-                          <span><i class="fas fa-clock"></i> {this.localizarFecha(det.fecha,det.zona_h,'DD-MM-YY HH:mm')}</span>  
-                          <span><i class="fas fa-mouse"></i> {det.mov_det == 1 ? <b style={{color:'green'}}>SI</b> : <b style={{color:'red'}}>NO</b>}</span> 
-                          <span><i class="fas fa-keyboard"></i> <b></b>{ det.press == 1 ? <b style={{color:'green'}}>{det.count}</b> : <b style={{color:'red'}}>NO</b>}</span>
+                          <span><i className="fas fa-clock"></i> {this.localizarFecha(det.fecha,det.zona_h,'DD-MM-YY HH:mm')}</span>  
+                          <span><i className="fas fa-mouse"></i> {det.mov_det == 1 ? <b style={{color:'green'}}>SI</b> : <b style={{color:'red'}}>NO</b>}</span> 
+                          <span><i className="fas fa-keyboard"></i> <b></b>{ det.press == 1 ? <b style={{color:'green'}}>{det.count}</b> : <b style={{color:'red'}}>NO</b>}</span>
                         </p>
                         
                       </div>
