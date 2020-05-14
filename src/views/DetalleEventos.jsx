@@ -29,7 +29,7 @@ class DetalleEventos extends Component {
       detalle: [],
       startDate: new Date(),
       show: false,
-      linkFotos:"http://190.106.102.50/fotos/ftp/",
+      linkFotos:"http://160.160.160.27/fotos/ftp/",
       urlFotos: "",
   
     }
