@@ -31,7 +31,8 @@ class DetalleEventos extends Component {
       show: false,
       linkFotos:"http://192.168.0.103/fotos/ftp/",
       urlFotos: "",
-  
+      
+      isLoaded: false,
     }
     this.handleClose = this.handleClose.bind(this);
   }
@@ -39,13 +40,14 @@ class DetalleEventos extends Component {
   
   componentDidMount(){
     
-    
-    this.peticionApi();
+    //console.log("SE HACE LA PETICION API")
+    this.getDatosDetalleEventos();
   }
 
   obtenerURLfotos(){
     //var fechaHoy = moment().format("YYYY-MM-DD");
     
+    console.log("SE HACE LA PETICION API")
     var url = "http://chaco.teledirecto.com:3003/login/juanm/011c945f30ce2cbafc452f39840f025693339c42/s"
     fetch(url)
         .then(res => res.json())
@@ -64,19 +66,34 @@ class DetalleEventos extends Component {
     });
   };
   
+  async getDatosDetalleEventos(){
+    console.log("GET DETALLE")
+    let respuestaApi = await this.peticionApi();
+    
+    let arrayJsx = [];
+
+    let arrayJsxCortado = respuestaApi.splice(0,100)
+    console.log("arrayJsxCortado",arrayJsxCortado.length)
+    
+    this.setState({arrayJsx: arrayJsxCortado, isLoaded:true}) 
+    
+  }
   
   peticionApi(params) {
+    
     var fechaHoy = moment().format("YYYY-MM-DD");
     
     var url = "http://chaco.teledirecto.com:3003/tdr/"+fechaHoy+"/00:00:00/"+fechaHoy+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
-    fetch(url)
-        .then(res => res.json())
-        .then((data) => {
-          this.setState({ detalle: data })
-          
-        })
-        .catch(console.log)
-    this.obtenerURLfotos();
+    //  
+    const fetchData = fetch(url)
+    .then(res => res.json())
+    .then((data) => {
+      return data
+    })
+    .catch(console.log);
+
+  return fetchData
+    //this.obtenerURLfotos();
   }
 
   getDetallesPorFecha(fechaDesde){
@@ -152,12 +169,12 @@ class DetalleEventos extends Component {
   }
   
   render() {
-
+    
     return (
-
+      
       <div className="content detalleEventos">
         {
-          this.state.detalle.length > 0 ? 
+          this.state.isLoaded ? 
             <Grid fluid>
            
             
@@ -214,8 +231,7 @@ class DetalleEventos extends Component {
             
                
             <Row>
-
-              {this.state.detalle.map(det =>
+            {this.state.arrayJsx.map(det =>
               <Col md={12} key={det.id}>
                    <Card
                     // title={this.localizarFecha(det.fecha,det.zona_h,'HH:mm')+" - "+ det.aplicacion}
@@ -251,7 +267,7 @@ class DetalleEventos extends Component {
                   </Card>
                 </Col>
                 
-              )}
+              )} 
               
 
             </Row>

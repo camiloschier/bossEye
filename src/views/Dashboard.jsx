@@ -122,6 +122,7 @@ class Dashboard extends Component {
   }
 
   buscarPorFecha(fecha){
+
     this.setState({elementosHora:[]})
     this.getDatosDiarios(fecha);
     this.getDatosHora(fecha);
@@ -159,6 +160,8 @@ class Dashboard extends Component {
         
       }
     }
+
+    
     //el array etiquetas queda cargado con las etiquetas
 
     let cantidades =[]
@@ -222,6 +225,7 @@ class Dashboard extends Component {
     console.log(horasEnArray)
     
     let copiaArrayDatos = arrayDatos
+    
     for (let index = 0; index < horasEnArray; index++) {
       
       let arrayDatosHora = arrayDatos.slice(0,59)
@@ -329,10 +333,11 @@ class Dashboard extends Component {
       // </BarChart>
   }
 
+
   renderHora(objetoData,leyendaData, horaInicio, horaFin, key){
     
     this.state.elementosHora.push(
-      <Col md={4} lg={3} key={key}>
+      <Col md={4} lg={4} key={key}>
       <div
         id="chartPreferences"
         className="ct-chart ct-perfect-fourth"
@@ -411,7 +416,7 @@ class Dashboard extends Component {
           
           <>
           <Row>
-              <Col md={3}>
+              <Col md={4}>
               <Card
               
               content={

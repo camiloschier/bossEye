@@ -23,7 +23,7 @@ import Icons from "views/Icons.jsx";
 import Maps from "views/Maps.jsx";
 import Notifications from "views/Notifications.jsx";
 import Upgrade from "views/Upgrade.jsx";
-
+import LoginScreen from "views/LoginScreen";
 const dashboardRoutes = [
   {
     path: "/detalleEventos",
@@ -39,13 +39,14 @@ const dashboardRoutes = [
     component: Dashboard,
     layout: "/admin"
   },
-  // {
-  //   path: "/user",
-  //   name: "Mi perfil",
-  //   icon: "pe-7s-user",
-  //   component: UserProfile,
-  //   layout: "/admin"
-  // },
+  
+  {
+    path: "/LoginScreen",
+    name: "Login",
+    icon: "pe-7s-user",
+    component: LoginScreen,
+    layout: "/admin"
+  },
   // {
   //   path: "/table",
   //   name: "Lista Usuarios",
