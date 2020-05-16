@@ -1,11 +1,12 @@
 
-import React, { Component } from "react";
-import { Grid, Row, Col, Button, Modal} from "react-bootstrap";
+import React, { Component, useState, useEffect } from "react";
+import { Grid, Row, Col, Button, Modal, Dropdown} from "react-bootstrap";
+import Pagination from '../components/Pagination/Pagination';
+import Posts from '../components/Posts/Post';
 import { FormInputs } from "components/FormInputs/FormInputs.jsx";
 import Card from "components/Card/Card.jsx";
 import { css } from "@emotion/core";
 import BeatLoader from "react-spinners/BeatLoader";
-import ReactTooltip from "react-tooltip";
 import DatePicker, { registerLocale } from "react-datepicker";
 import es from "date-fns/locale/es"; // the locale you want
 
@@ -23,6 +24,7 @@ const override = css`
 
 
 class DetalleEventos extends Component {
+  
   constructor(props){
     super(props);
     this.state = {
@@ -31,10 +33,15 @@ class DetalleEventos extends Component {
       show: false,
       linkFotos:"http://192.168.0.103/fotos/ftp/",
       urlFotos: "",
-      
+      currentPage:1,
+      postsPerPage:50,
+      posts: [],
+      currentPosts: [],
       isLoaded: false,
     }
+    this.handleChangePorPagina = this.handleChangePorPagina.bind(this)
     this.handleClose = this.handleClose.bind(this);
+    this.cambiarPagina = this.cambiarPagina.bind(this)
   }
   
   
@@ -71,11 +78,13 @@ class DetalleEventos extends Component {
     let respuestaApi = await this.peticionApi();
     
     let arrayJsx = [];
+    const indexOfLastPost = this.state.currentPage * this.state.postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - this.state.postsPerPage;
+    console.log("PRIMER PAGINA", indexOfFirstPost)
+    const currentPosts = respuestaApi.slice(indexOfFirstPost, indexOfLastPost);
 
-    let arrayJsxCortado = respuestaApi.splice(0,100)
-    console.log("arrayJsxCortado",arrayJsxCortado.length)
     
-    this.setState({arrayJsx: arrayJsxCortado, isLoaded:true}) 
+    this.setState({posts: respuestaApi,currentPosts: currentPosts, isLoaded:true}) 
     
   }
   
@@ -167,9 +176,34 @@ class DetalleEventos extends Component {
   handleClose(){
     this.setState({show:false})
   }
-  
+  renderearPosts = (pageNumber) =>{
+    console.log("NUMERO DE PAGINA",pageNumber )
+    
+    console.log("NUMERO DE PAGINA SIGUIENTE",this.state.currentPage )
+    const indexOfLastPost = pageNumber * this.state.postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - this.state.postsPerPage;
+    console.log("PRIMER PAGINA", indexOfFirstPost)
+    const currentPosts =  this.state.posts.slice(indexOfFirstPost, indexOfLastPost);
+
+    console.log("arrayJsxCortado")
+    this.setState({currentPosts: currentPosts, isLoaded:true}) 
+  }
+  cambiarPagina =  (pageNumber) =>{
+    //alert("cambiarPagina",typeof(pageNumber));
+    this.setState({currentPage:pageNumber},this.renderearPosts(pageNumber));
+    
+
+   
+    
+  }
+  handleChangePorPagina(event) {
+    this.setState({value: event.target.value}, this.cambiarPagina(this.state.currentPage));
+  }
   render() {
     
+    // Change page
+    const paginate = pageNumber => this.setState({currentPage: pageNumber});
+
     return (
       
       <div className="content detalleEventos">
@@ -226,51 +260,42 @@ class DetalleEventos extends Component {
                   }
                 />
               </Col>
+              <Col md={4}>
+              <Card
+
+                content={
+                  <div style={{textAlign:'center'}}>
+                  <Pagination
+                    postsPerPage={this.state.postsPerPage}
+                    totalPosts={this.state.posts.length}
+                    paginate={this.cambiarPagina}
+                    /> 
+                  <hr/>
+                  <label>
+                    Resultados por pagina: 50
+                    {/* <select value={this.state.postsPerPage} name="postsPerPage" onChange={this.handleChangePorPagina}>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select> */}
+                  </label>
+
+                  </div>
+                }
+                />
+                
+              </Col>
               
             </Row>
             
                
             <Row>
-            {this.state.arrayJsx.map(det =>
-              <Col md={12} key={det.id}>
-                   <Card
-                    // title={this.localizarFecha(det.fecha,det.zona_h,'HH:mm')+" - "+ det.aplicacion}
-                    // category="Created using Roboto Font Family"
-                    content={
-                    
-                    <div className="tarjeta-detalles">
-                      <div className="tarjeta-detalles-texto">
-                        
-                        <p>Aplicacion: {det.aplicacion}</p>
-                        
-                        <p data-tip={det.titulo} className="tarjeta-detalles-texto-titulo">Titulo: {(det.titulo)}</p>
-                        <ReactTooltip />
-                        <p className="tarjeta-detalles-texto-iconos">
-                          <span><i className="fas fa-clock"></i> {this.localizarFecha(det.fecha,det.zona_h,'DD-MM-YY HH:mm')}</span>  
-                          <span><i className="fas fa-mouse"></i> {det.mov_det == 1 ? <b style={{color:'green'}}>SI</b> : <b style={{color:'red'}}>NO</b>}</span> 
-                          <span><i className="fas fa-keyboard"></i> <b></b>{ det.press == 1 ? <b style={{color:'green'}}>{det.count}</b> : <b style={{color:'red'}}>NO</b>}</span>
-                        </p>
-                        
-                      </div>
-
-                      <div className="tarjeta-detalles-texto">
-                        <p>Calificación: <b>{det.calificacion == null ? "Desconocido" : det.calificacion}</b></p>
-                        <p>Link: <a href="#" onClick={() => this.handleShow(det.print_scr)}>Imagen</a> </p>
-                        <p>Latencia: <b>{det.latency}</b></p>
-                      </div>
-                    
-                    </div>
-                      
-                    }
-                  >
-                      
-                  </Card>
-                </Col>
-                
-              )} 
+            <Posts posts={this.state.currentPosts} loading={!this.state.isLoaded}/>
               
 
             </Row>
+            
           </Grid>
           :
           <div className="sweet-loading">
