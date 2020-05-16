@@ -66,8 +66,7 @@ class Login extends Component {
   }
   
   login = async () => {
-    const history = useHistory();
-    history.push("/admin");
+    
     if (this.state.usuario.length == "" || this.state.password.length == "") {
       alert("Complete los campos")
       return
@@ -106,8 +105,8 @@ class Login extends Component {
               <input type="checkbox" value="remember-me"/> Remember me
             </label>
           </div>
-          <Link to="/admin">View profile</Link>
-          <button className="btn btn-lg btn-primary btn-block botonSignIn" type="submit" onClick={this.login}>Sign in</button>
+          
+          <Link to="/admin"><button className="btn btn-lg btn-primary btn-block botonSignIn" type="submit" onClick={this.login}>Iniciar Sesión</button></Link>
           <p className="mt-5 mb-3 text-muted leyenda">&copy; 2020</p>
         </div>
       </form>
