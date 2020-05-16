@@ -45,7 +45,7 @@ const dashboardRoutes = [
     name: "Login",
     icon: "pe-7s-user",
     component: LoginScreen,
-    layout: "/admin"
+    layout: "/loginScreen"
   },
   // {
   //   path: "/table",
