@@ -18,11 +18,7 @@
 import React, { Component } from "react";
 import { Route, Switch } from "react-router-dom";
 import NotificationSystem from "react-notification-system";
-
-import AdminNavbar from "components/Navbars/AdminNavbar";
-import Footer from "components/Footer/Footer";
-import Sidebar from "components/Sidebar/Sidebar";
-import FixedPlugin from "components/FixedPlugin/FixedPlugin.jsx";
+import Login from "../views/Login"
 
 import { style } from "variables/Variables.jsx";
 
@@ -171,10 +167,9 @@ class LoginScreen extends Component {
 //   }
   render() {
     return (
-      <div className="wrapper">
-          <Switch>{this.getRoutes(routes)}</Switch>
-          <h1>Login</h1>
-          
+      <>
+          {/* //<Switch>{this.getRoutes(routes)}</Switch> */}
+          <Login/>          
         {/* <NotificationSystem ref="notificationSystem" style={style} />
         <Sidebar {...this.props} routes={routes} image={this.state.image}
         color={this.state.color}
@@ -197,7 +192,7 @@ class LoginScreen extends Component {
             fixedClasses={this.state.fixedClasses}
           />
         </div> */}
-      </div>
+      </>
     );
   }
 }

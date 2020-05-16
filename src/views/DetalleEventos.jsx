@@ -88,11 +88,25 @@ class DetalleEventos extends Component {
     
   }
   
-  peticionApi(params) {
+  peticionApi(fecha,fechaHoraDesde,fechaHoraHasta) {
+    console.log("PARAMS", fecha)
+    if (fecha == undefined) {
+      var fechaHoy = moment().format("YYYY-MM-DD");
+    }
+    else{
+      var fechaHoy = moment(fecha).format("YYYY-MM-DD");
+    }
+    if (fechaHoraDesde == undefined || fechaHoraHasta == undefined){
+      var horaDesde = "00:00:00"
+      var horaHasta = "23:59"
+    }
+    else{
+      var horaDesde = fechaHoraDesde
+      var horaHasta = fechaHoraHasta
+    }
+      
     
-    var fechaHoy = moment().format("YYYY-MM-DD");
-    
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fechaHoy+"/00:00:00/"+fechaHoy+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fechaHoy+"/"+horaDesde+"/"+fechaHoy+"/"+horaHasta+"/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
     //  
     const fetchData = fetch(url)
     .then(res => res.json())
@@ -105,7 +119,7 @@ class DetalleEventos extends Component {
     //this.obtenerURLfotos();
   }
 
-  getDetallesPorFecha(fechaDesde){
+  async getDetallesPorFecha(fechaDesde){
     
     var fecha1 = moment(fechaDesde).format("YYYY-MM-DD");
     var fecha2 = moment(fechaDesde).add(1, 'd').format("YYYY-MM-DD");
@@ -113,25 +127,26 @@ class DetalleEventos extends Component {
     var hora1 = moment(fechaDesde).format("HH:mm:ss");
     var hora2 = moment(fechaDesde).add(1, 'h').format("HH:mm:ss");
 
+
+    let respuestaApi = await this.peticionApi(fecha1);
+    console.log("respuesta api",respuestaApi)
+    this.setState({ posts: respuestaApi })
+    let arrayJsx = [];
+    const indexOfLastPost = this.state.currentPage * this.state.postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - this.state.postsPerPage;
+    console.log("PRIMER PAGINA", indexOfFirstPost)
+    const currentPosts = respuestaApi.slice(indexOfFirstPost, indexOfLastPost);
+
+    
+    this.setState({posts: respuestaApi,currentPosts: currentPosts, isLoaded:true}) 
     // console.log("FECHA 1",fecha1);
     // console.log("FECHA 2",fecha2);
 
     // console.log("HORA 1", hora1);
     // console.log("HORA 1", hora2);
 
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha1+"/00:00:00/"+fecha1+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
-    fetch(url)
-        .then(res => res.json())
-        .then((data) => {
-          this.setState({ detalle: data })
-          
-        })
-        .then(() => {
-          console.log("2da peticion")
-        })
-        .catch(console.log)
   }
-  getDetallesPorHora(fechaDesde){
+  async getDetallesPorHora(fechaDesde){
     
     var fecha1 = moment(fechaDesde).format("YYYY-MM-DD");
     // var fecha2 = moment(fechaDesde).add(1, 'd').format("YYYY-MM-DD");
@@ -141,6 +156,23 @@ class DetalleEventos extends Component {
 
     // console.log("FECHA 1",fecha1);
     // console.log("FECHA 2",fecha2);
+    let respuestaApi = await this.peticionApi(fecha1, hora1,hora2);
+    console.log("respuesta api",respuestaApi)
+
+    this.setState({ posts: respuestaApi })
+    let arrayJsx = [];
+    const indexOfLastPost = this.state.currentPage * this.state.postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - this.state.postsPerPage;
+    console.log("PETICION POR HORA", indexOfFirstPost)
+    const currentPosts = respuestaApi.slice(indexOfFirstPost, indexOfLastPost);
+
+    
+    this.setState({posts: respuestaApi,currentPosts: currentPosts, isLoaded:true}) 
+    // console.log("FECHA 1",fecha1);
+    // console.log("FECHA 2",fecha2);
+
+    // console.log("HORA 1", hora1);
+    // console.log("HORA 1", hora2);
 
     console.log("HORA 1", hora1);
     // console.log("HORA 1", hora2);
@@ -191,10 +223,6 @@ class DetalleEventos extends Component {
   cambiarPagina =  (pageNumber) =>{
     //alert("cambiarPagina",typeof(pageNumber));
     this.setState({currentPage:pageNumber},this.renderearPosts(pageNumber));
-    
-
-   
-    
   }
   handleChangePorPagina(event) {
     this.setState({value: event.target.value}, this.cambiarPagina(this.state.currentPage));
@@ -260,17 +288,18 @@ class DetalleEventos extends Component {
                   }
                 />
               </Col>
-              <Col md={4}>
+              <Col md={6}>
               <Card
 
                 content={
-                  <div style={{textAlign:'center'}}>
+                  <div style={{textAlign:'center', margin:'0px'}}>
                   <Pagination
                     postsPerPage={this.state.postsPerPage}
                     totalPosts={this.state.posts.length}
                     paginate={this.cambiarPagina}
+                    style={{margin:'0px'}}
                     /> 
-                  <hr/>
+                  <hr style={{marginTop:'5px', marginBottom:'10px'}}/>
                   <label>
                     Resultados por pagina: 50
                     {/* <select value={this.state.postsPerPage} name="postsPerPage" onChange={this.handleChangePorPagina}>

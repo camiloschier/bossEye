@@ -16,9 +16,18 @@
 
 */
 import React, { Component } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 import { NavItem, Nav, NavDropdown, MenuItem } from "react-bootstrap";
 
 class AdminNavbarLinks extends Component {
+  cerrarSesion(){
+    alert("CerrarSesion")
+  }
   render() {
     const notification = (
       <div>
@@ -28,9 +37,13 @@ class AdminNavbarLinks extends Component {
         <p className="hidden-lg hidden-md">Notification</p>
       </div>
     );
+    //aca esta la funcion que desloguea
+    const hello = () => {return alert("hola")}
     return (
       <div>
-        <Nav>
+        <Nav 
+        activeKey="/admin"
+        onSelect={(selectedKey) => alert(`selected ${selectedKey}`)} >
           {/* <NavItem eventKey={1} href="#">
             <i className="fa fa-dashboard" />
             <p className="hidden-lg hidden-md">Dashboard</p>
@@ -69,10 +82,12 @@ class AdminNavbarLinks extends Component {
             <MenuItem divider />
             <MenuItem eventKey={2.5}>Separated link</MenuItem>
           </NavDropdown> */}
-          <NavItem eventKey={3} href="#">
-            Cerrar Sesión
+          {/* ESTE LINK TE LLEVA A LA LOGIN Y ANTES TE HACE EL ONCLICK */}
+          <NavItem >
+            <Link to="/loginScreen" onClick={hello}>Cerrar Sesion</Link>
           </NavItem>
         </Nav>
+        
       </div>
     );
   }

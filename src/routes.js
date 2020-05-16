@@ -23,7 +23,7 @@ import Icons from "views/Icons.jsx";
 import Maps from "views/Maps.jsx";
 import Notifications from "views/Notifications.jsx";
 import Upgrade from "views/Upgrade.jsx";
-import LoginScreen from "views/LoginScreen";
+import Login from "views/Login";
 const dashboardRoutes = [
   {
     path: "/detalleEventos",
@@ -44,7 +44,7 @@ const dashboardRoutes = [
     path: "/LoginScreen",
     name: "Login",
     icon: "pe-7s-user",
-    component: LoginScreen,
+    component: Login,
     layout: "/loginScreen"
   },
   // {
