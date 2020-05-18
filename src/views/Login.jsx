@@ -20,7 +20,7 @@ import { Grid, Row, Col, Button } from "react-bootstrap";
 import { FormInputs } from "components/FormInputs/FormInputs.jsx";
 import { Card } from "components/Card/Card.jsx";
  import "../assets/css/login.css"
- import logo from '../assets/img/medico.svg';
+ import logo from 'assets/img/medico.svg';
  import { Redirect, Link,BrowserRouter as Router  } from "react-router-dom";
  import { useHistory } from "react-router-dom";
 
