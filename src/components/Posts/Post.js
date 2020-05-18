@@ -39,9 +39,9 @@ const Posts = ({ posts, loading, handleShow, hayDatos }) => {
                       <div className="tarjeta-detalles">
                       <div className="tarjeta-detalles-texto">
                           
-                          <p>Aplicacion: {post.aplicacion}</p>
+                          <p><b>Aplicacion: </b>{post.aplicacion}</p>
                           
-                          <p data-tip={post.titulo} className="tarjeta-detalles-texto-titulo">Titulo: {(post.titulo)}</p>
+                          <p data-tip={post.titulo} className="tarjeta-detalles-texto-titulo"><b>Titulo:</b> {(post.titulo)}</p>
                           <ReactTooltip />
                           <p className="tarjeta-detalles-texto-iconos">
                           <span><i className="fas fa-clock"></i> {localizarFecha(post.fecha,post.zona_h,'DD-MM-YY HH:mm')}</span>  

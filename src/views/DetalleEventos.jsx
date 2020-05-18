@@ -102,7 +102,7 @@ class DetalleEventos extends Component {
     }
       
     let user = JSON.parse(localStorage.getItem('user'))
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fechaHoy+"/"+horaDesde+"/"+fechaHoy+"/"+horaHasta+"/"+user.user+"/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fechaHoy+"/"+horaDesde+"/"+fechaHoy+"/"+horaHasta+"/"+user.user+"/"+user.entidad+""
     //  
     const fetchData = fetch(url)
     .then(res => res.json())

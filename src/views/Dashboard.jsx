@@ -422,7 +422,7 @@ class Dashboard extends Component {
 
     let datosArray = []
     let user = JSON.parse(localStorage.getItem('user'))
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/00:00:00/"+fecha+"/23:59:00/"+user.user+"/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/00:00:00/"+fecha+"/23:59:00/"+user.user+"/"+user.entidad+""
     
     const fetchData = fetch(url)
       .then(res => res.json())

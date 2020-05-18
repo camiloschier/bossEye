@@ -84,6 +84,7 @@ class Login extends Component {
     }
     if (objetoLogin.length > 0 && objetoLogin[0].user == this.state.usuario) {
       //this.setState({isLoged: true}) //aca le paso al componente padre la funcion handleSucessfull
+      localStorage.setItem('user',JSON.stringify(objetoLogin[0]))
       this.props.handleSucessfullAuth(objetoLogin[0]);
     }
   }

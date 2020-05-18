@@ -37,6 +37,7 @@ class AdminNavbarLinks extends Component {
     this.props.history.push("/loginScreen");
   }
   render() {
+    const user = JSON.parse(localStorage.getItem('user'));
     const notification = (
       <div>
         <i className="fa fa-globe" />
@@ -91,6 +92,13 @@ class AdminNavbarLinks extends Component {
             <MenuItem eventKey={2.5}>Separated link</MenuItem>
           </NavDropdown> */}
           {/* ESTE LINK TE LLEVA A LA LOGIN Y ANTES TE HACE EL ONCLICK */}
+          <NavItem >
+          {user.empresa}
+          </NavItem>
+          -
+          <NavItem >
+          {user.nombre}
+          </NavItem>
           <NavItem >
             <a onClick={this.cerrarSesion}>Cerrar Sesion</a>
           </NavItem>
