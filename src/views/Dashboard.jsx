@@ -22,6 +22,9 @@ import { FormInputs } from "components/FormInputs/FormInputs.jsx";
 import { Card } from "components/Card/Card.jsx";
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
 import { Tasks } from "components/Tasks/Tasks.jsx";
+
+import { css } from "@emotion/core";
+import BeatLoader from "react-spinners/BeatLoader";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es"; // the locale you want
@@ -75,6 +78,11 @@ let legendPie = {
   names: ["Tarea", "Distraccion", "Comunicacion"],
   types: ["info", "danger", "warning"]
 };
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
 
 class Dashboard extends Component {
   constructor(props){
@@ -86,7 +94,7 @@ class Dashboard extends Component {
       //DatePicker
       startDate: new Date(),
       isLoaded: false,
-      
+      isLoading:false,
       elementosHora: [],
       flagHora: false,
       nombreUsuario:"",
@@ -128,11 +136,13 @@ class Dashboard extends Component {
     //this.buscarPorFecha(fecha)
   }
 
-  buscarPorFecha(fecha){
+  async buscarPorFecha(fecha){
 
-    this.setState({elementosHora:[]})
+    this.setState({elementosHora:[],isLoading: true})
+    await new Promise(resolve => setTimeout(resolve, 1500));
     this.getDatosDiarios(fecha);
     this.getDatosHora(fecha);
+    this.setState({ isLoading: false})
 
   }
   // Refactor
@@ -146,6 +156,7 @@ class Dashboard extends Component {
       this.setState({hayDatos: false, isLoaded:true})
       return
     }
+    this.setState({hayDatos:true})
 
     //tengo el array y ahora lo necesito convertir a el objeto para los graficos
 
@@ -310,7 +321,7 @@ class Dashboard extends Component {
         types: ["info", "danger", "warning"]
       };
       let key = index
-      this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0] .fecha.substr(11,8),key)
+      this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0].fecha.substr(11,8),key)
 
 
 
@@ -352,7 +363,10 @@ class Dashboard extends Component {
 
 
   renderHora(objetoData,leyendaData, horaInicio, horaFin, key){
-    
+    let m = moment(horaInicio);
+    console.log("m", horaInicio)
+    let roundDown = m.startOf('hour');
+    console.log("roundDown", roundDown)
     this.state.elementosHora.push(
       <Col md={4} lg={4} key={key}>
       <div
@@ -368,9 +382,11 @@ class Dashboard extends Component {
                 // stats="Campaign sent 2 days ago"
                 content={
                   <>
+                      <div className="titulo-reporte">{horaInicio.substr(0,5)} - {horaFin.substr(0,5)}</div>
+
                   <div style={{display:'flex', justifyContent:'center'}}>
+                  
                     <div>
-                <div className="titulo-reporte">{horaInicio} - {horaFin}</div>
                       <div className="nombre-usuario-reporte">Usuario: {this.state.nombreUsuario} </div>
                       <div style={{display:'flex',flexDirection:'column'}}>{this.createLegend(leyendaData)}</div>
                     </div>
@@ -398,7 +414,7 @@ class Dashboard extends Component {
     )
 
 
-    this.setState({flagHora: true})
+    this.setState({flagHora: true, isLoading: false})
     console.log("ELEMENTOS HORA", this.state.elementosHora)
     
   }
@@ -460,7 +476,7 @@ class Dashboard extends Component {
               />
               </Col>
           
-
+            
             <Col md={6}>
               <Card
                 
@@ -472,7 +488,14 @@ class Dashboard extends Component {
                 content={
                   <>
                   <div style={{display:'flex', justifyContent:'center'}}>
-                    <div>
+                    {
+                      !this.state.isLoading ?
+                    
+                    <>
+                      {this.state.hayDatos 
+                      ?
+                      <>
+                      <div>
                       <div className="titulo-reporte">Reporte Diario</div>
                       <div className="nombre-usuario-reporte">Usuario: {this.state.nombreUsuario} </div>
                       <div style={{display:'flex',flexDirection:'column'}}>{this.createLegend(this.state.legendDatosDiarios)}</div>
@@ -482,10 +505,26 @@ class Dashboard extends Component {
                       id="chartPreferences"
                       className="ct-chart ct-perfect-fourth"
                     >
-                      
-                      <ChartistGraph data={this.state.objetoDatosDiarios} type="Pie"/>
+                    <ChartistGraph data={this.state.objetoDatosDiarios} type="Pie"/>
                       {/* {this.createLegend(this.state.legendDatosDiarios)} */}
                     </div>
+                    </>
+                    :
+                    <div className="titulo-reporte">No hay datos para esta fecha</div>
+                    }
+                      
+                    </>
+                    :
+                    <div className="sweet-loading">
+                    <BeatLoader
+                      css={override}
+                      size={40}
+                      color={"#123abc"}
+                      loading={true}
+                    />
+                  </div>
+                    }
+                
                   </div>
                   </>
                 }
@@ -496,6 +535,7 @@ class Dashboard extends Component {
               />
               
             </Col>
+            
             </Row>
             <Row>
               <Col md={12}>
@@ -505,18 +545,46 @@ class Dashboard extends Component {
                       <div className="nombre-usuario-reporte">Usuario: Camilo Perona </div>
 
                       {
+                        this.state.hayDatos ?
+                          this.state.isLoading ?
+                          <div className="sweet-loading">
+                    <BeatLoader
+                      css={override}
+                      size={40}
+                      color={"#123abc"}
+                      loading={true}
+                    />
+                  </div>
+                          :
+                          <div>
+                          {this.state.elementosHora}
+                          </div>
+                        :
+                        <Col md={12} xs={12} lg={12}>
+          
+          
+          <div className="detalle-evento-alert-noDatos">
+          
+            <span>No hay datos de este periodo.</span>
+          
+          </div>
+      
+
+      
+      </Col>
+                      }
+                      {/* {
+                        
                       this.state.flagHora  ?
                       
-                      <div>
-                        {this.state.elementosHora}
-                      </div>
+                      
                       :
                       this.state.hayDatos ?
                         "cargando"
                       
                       :
                         "No hay datos para el periodo seleccionado"
-                       }
+                       } */}
                       
                   </div>
                 

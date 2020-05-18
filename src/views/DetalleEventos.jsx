@@ -38,6 +38,7 @@ class DetalleEventos extends Component {
       posts: [],
       currentPosts: [],
       isLoaded: false,
+      isLoading:false,
       hayDatos: true
     }
     this.handleChangePorPagina = this.handleChangePorPagina.bind(this)
@@ -115,7 +116,7 @@ class DetalleEventos extends Component {
   }
 
   async getDetallesPorFecha(fechaDesde){
-    
+    this.setState({isLoading:true})
     var fecha1 = moment(fechaDesde).format("YYYY-MM-DD");
     var fecha2 = moment(fechaDesde).add(1, 'd').format("YYYY-MM-DD");
 
@@ -125,7 +126,7 @@ class DetalleEventos extends Component {
 
     let respuestaApi = await this.peticionApi(fecha1);
     if (respuestaApi.length == 0) {
-      this.setState({hayDatos: false})
+      this.setState({hayDatos: false,isLoading:false})
       return
     }
     else{
@@ -140,7 +141,7 @@ class DetalleEventos extends Component {
     const currentPosts = respuestaApi.slice(indexOfFirstPost, indexOfLastPost);
 
     
-    this.setState({posts: respuestaApi,currentPosts: currentPosts, isLoaded:true}) 
+    this.setState({posts: respuestaApi,currentPosts: currentPosts, isLoading:false}) 
     // console.log("FECHA 1",fecha1);
     // console.log("FECHA 2",fecha2);
 
@@ -329,8 +330,20 @@ class DetalleEventos extends Component {
             
                
             <Row>
-            <Posts hayDatos={this.state.hayDatos} posts={this.state.currentPosts} loading={!this.state.isLoaded} handleShow={this.handleShow}/>
-              
+              {this.state.isLoading ?
+              <div className="sweet-loading" style={{display:'flex'}}>
+              <BeatLoader
+                css={override}
+                size={40}
+                color={"#123abc"}
+                loading={true}
+              />
+            </div>
+            :
+            <Posts hayDatos={this.state.hayDatos} posts={this.state.currentPosts}  handleShow={this.handleShow}/>
+             
+            }
+             
 
             </Row>
             

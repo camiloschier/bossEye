@@ -176,7 +176,7 @@ class Admin extends Component {
         <Sidebar {...this.props} routes={routes} 
         color={this.state.color}
         hasImage={this.state.hasImage}/>
-        <div id="main-panel" className="main-panel" ref="mainPanel">
+        <div id="main-panel" className="main-panel" ref="mainPanel" style={{height:'100vh'}}>
           <AdminNavbar
             {...this.props}
             brandText={this.getBrandText(this.props.location.pathname)}

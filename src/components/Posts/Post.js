@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col } from "react-bootstrap";
+import { Col, Alert } from "react-bootstrap";
 import Card from "components/Card/Card.jsx";
 
 import ReactTooltip from "react-tooltip";
@@ -71,7 +71,19 @@ const Posts = ({ posts, loading, handleShow, hayDatos }) => {
     );
   }
   else{
-    return (<h1>No hay datos para el periodo seleccionado</h1>);
+    return ( 
+      <Col md={12} xs={12} lg={12}>
+          
+          
+          <div className="detalle-evento-alert-noDatos">
+          
+            <span>No hay datos de este periodo.</span>
+          
+          </div>
+      
+
+      
+      </Col>);
   }
       
   

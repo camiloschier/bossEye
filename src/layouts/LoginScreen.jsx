@@ -120,7 +120,7 @@ class LoginScreen extends Component {
 //   };
   handleSucessfullAuth(data){
     this.props.handleLogin(data);
-    this.props.history.push("/admin");
+    this.props.history.push("/admin/dashboard");
   }
   componentDidMount() {
     this.setState({ _notificationSystem: this.refs.notificationSystem });
