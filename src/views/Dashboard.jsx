@@ -88,7 +88,9 @@ class Dashboard extends Component {
       isLoaded: false,
       
       elementosHora: [],
-      flagHora: false
+      flagHora: false,
+      nombreUsuario:"",
+      hayDatos: true,
       
     }
   }
@@ -114,7 +116,12 @@ class Dashboard extends Component {
   };
 
   componentDidMount(){
+    let localestore = JSON.parse(localStorage.getItem('user'))
+    this.setState({nombreUsuario: localestore.nombre})
+   
+
     let fecha = moment().format("YYYY-MM-DD");
+    console.log()
     this.getDatosDiarios(fecha);
     this.getDatosHora(fecha);
     //this.cargarChart();
@@ -130,10 +137,15 @@ class Dashboard extends Component {
   }
   // Refactor
   async getDatosDiarios(fecha){
-    console.log("Se ejecuto getdatosdiarios")
+    //console.log("Se ejecuto getdatosdiarios")
     let fechaActual = moment(fecha).format("YYYY-MM-DD");
-    console.log(fechaActual)
+    //console.log(fechaActual)
     let arrayDatos = await this.peticionApi(fechaActual)
+    
+    if (arrayDatos.lenght == 0) {
+      this.setState({hayDatos: false, isLoaded:true})
+      return
+    }
 
     //tengo el array y ahora lo necesito convertir a el objeto para los graficos
 
@@ -173,7 +185,7 @@ class Dashboard extends Component {
       cantidades.push(pruebas.length)
     }
 
-    console.log("Etiquetas", etiquetas);
+    //console.log("Etiquetas", etiquetas);
     // console.log("Cantidades", cantidades);
 
     //cuento cuantos items hay en todo el arreglo
@@ -195,7 +207,7 @@ class Dashboard extends Component {
       types: ["info", "danger", "warning"]
     };
 
-    console.log("objetoDatosDiarios", objetoDatosDiarios)
+    //console.log("objetoDatosDiarios", objetoDatosDiarios)
 
 
     this.setState({objetoDatosDiarios: objetoDatosDiarios, legendDatosDiarios: legendDatosDiarios, isLoaded:true})
@@ -206,32 +218,37 @@ class Dashboard extends Component {
     //MODIFICAR FUNCION PARA QUE A PARTIR DE LA HORA INICIO Y HORA FIN CALCULE LAS HORAS Y CICLE CADA UNA HORA DE ESO
    
     let fechaActual = moment(fecha).format("YYYY-MM-DD");
-    console.log("Se ejecuto getdatoshras en fecha",moment(fecha).format("HH:mm"))
-    console.log(fechaActual)
+    // console.log("Se ejecuto getdatoshras en fecha",moment(fecha).format("HH:mm"))
+    // console.log(fechaActual)
     let arrayDatos = await this.peticionApi(fechaActual);
+
+    console.log("ARRAY DATOS", arrayDatos)
     //a partir de aca calculo diferencia entre las horas
-    
+    if (arrayDatos.length == 0) {
+      this.setState({hayDatos: false, isLoaded:true})
+      return
+    }
     let primerHora = moment(arrayDatos[0].fecha).format("HH:mm")
-    console.log("Primer hora",primerHora)
+    //console.log("Primer hora",primerHora)
     let ultimaHora = moment(arrayDatos[arrayDatos.length-1].fecha).format("HH:mm")
     
-    console.log("Ultima hora",ultimaHora)
+    //console.log("Ultima hora",ultimaHora)
 
     
-    console.log("arrayDatos",arrayDatos)
+    //console.log("arrayDatos",arrayDatos)
     //divido el array en 60
     let horasEnArray = Math.ceil(arrayDatos.length / 60)
     
-    console.log(horasEnArray)
+    //console.log(horasEnArray)
     
     let copiaArrayDatos = arrayDatos
     
     for (let index = 0; index < horasEnArray; index++) {
       
       let arrayDatosHora = arrayDatos.slice(0,59)
-      console.log("ARRAY HORA", arrayDatosHora)
+      // console.log("ARRAY HORA", arrayDatosHora)
       //obtengo primer hora array
-      console.log("PRIMER HORA", )
+      //console.log("PRIMER HORA", )
       
 
       //a partir de esto genero las etiquetas y labels necesarios
@@ -276,8 +293,8 @@ class Dashboard extends Component {
       //calculo el porcentaje que representa cada elemento del array 
       let etiquetasPorcentaje = []
       cantidades.forEach(item => etiquetasPorcentaje.push(String(Math.round(item*100/sumaCantidades))+"%"))
-      console.log("Cantidades", cantidades);
-      console.log("Etiquetas Porcentaje", etiquetasPorcentaje);
+      // console.log("Cantidades", cantidades);
+      // console.log("Etiquetas Porcentaje", etiquetasPorcentaje);
 
       //ahora que tengo los datos, deberia armar el objeto y pasarselo a una funcion que lo renderee
       
@@ -300,8 +317,8 @@ class Dashboard extends Component {
       //lo elimino una vez que realice los datos
       arrayDatos.splice(0,59)
       
-      console.log("NUEVO ARRAY",arrayDatos)
-      console.log("ETIQUETAS HORA", etiquetas)
+      // console.log("NUEVO ARRAY",arrayDatos)
+      // console.log("ETIQUETAS HORA", etiquetas)
 
 
       }
@@ -344,7 +361,7 @@ class Dashboard extends Component {
       >
       <Card
                 
-                title="Usuario: Camilo Perona"
+                title={"Usuario:", this.state.nombreUsuario}
                 // showTitle={true}
                 // category="Reporte Diario Total"
                 // statsIcon="fa fa-clock-o"
@@ -354,7 +371,7 @@ class Dashboard extends Component {
                   <div style={{display:'flex', justifyContent:'center'}}>
                     <div>
                 <div className="titulo-reporte">{horaInicio} - {horaFin}</div>
-                      <div className="nombre-usuario-reporte">Usuario: Camilo Perona </div>
+                      <div className="nombre-usuario-reporte">Usuario: {this.state.nombreUsuario} </div>
                       <div style={{display:'flex',flexDirection:'column'}}>{this.createLegend(leyendaData)}</div>
                     </div>
                       
@@ -388,7 +405,8 @@ class Dashboard extends Component {
   peticionApi(fecha){
 
     let datosArray = []
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/00:00:00/"+fecha+"/23:59:00/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    let user = JSON.parse(localStorage.getItem('user'))
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha+"/00:00:00/"+fecha+"/23:59:00/"+user.user+"/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
     
     const fetchData = fetch(url)
       .then(res => res.json())
@@ -446,7 +464,7 @@ class Dashboard extends Component {
             <Col md={6}>
               <Card
                 
-                title="Usuario: Camilo Perona"
+                //title={"Usuario:"}
                 // showTitle={true}
                 // category="Reporte Diario Total"
                 // statsIcon="fa fa-clock-o"
@@ -456,7 +474,7 @@ class Dashboard extends Component {
                   <div style={{display:'flex', justifyContent:'center'}}>
                     <div>
                       <div className="titulo-reporte">Reporte Diario</div>
-                      <div className="nombre-usuario-reporte">Usuario: Camilo Perona </div>
+                      <div className="nombre-usuario-reporte">Usuario: {this.state.nombreUsuario} </div>
                       <div style={{display:'flex',flexDirection:'column'}}>{this.createLegend(this.state.legendDatosDiarios)}</div>
                     </div>
                       
@@ -486,13 +504,18 @@ class Dashboard extends Component {
                       <div className="titulo-reporte">Reporte por horas</div>
                       <div className="nombre-usuario-reporte">Usuario: Camilo Perona </div>
 
-                      {this.state.flagHora  ?
+                      {
+                      this.state.flagHora  ?
                       
                       <div>
                         {this.state.elementosHora}
                       </div>
                       :
-                      "cargando"
+                      this.state.hayDatos ?
+                        "cargando"
+                      
+                      :
+                        "No hay datos para el periodo seleccionado"
                        }
                       
                   </div>

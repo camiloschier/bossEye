@@ -58,6 +58,7 @@ class Login extends Component {
     const fetchData = fetch(url)
       .then(res => res.json())
       .then((data) => {
+      
         return data
       })
       .catch(console.log);
@@ -65,20 +66,25 @@ class Login extends Component {
     return fetchData
   }
   
-  login = async () => {
+  login =  async() => {
     
+    //localStorage.setItem('login',true)
+    //console.log("LOCAL",localStorage.getItem('login'))
     if (this.state.usuario.length == "" || this.state.password.length == "") {
       alert("Complete los campos")
       return
     }
+    
     console.log("USER", this.state.usuario,"password:",this.state.password)
     const objetoLogin = await this.llamadaApiLogin(this.state.usuario,this.state.password)
-    console.log(objetoLogin[0].user)
-
+    console.log(objetoLogin)
+    if (objetoLogin == undefined) {
+      alert("Usuario y contraseña erroneo, ingrese nuevamente")
+      return
+    }
     if (objetoLogin.length > 0 && objetoLogin[0].user == this.state.usuario) {
-      this.setState({isLoged: true})
-    } else {
-      this.setState({isLoged: false})
+      //this.setState({isLoged: true}) //aca le paso al componente padre la funcion handleSucessfull
+      this.props.handleSucessfullAuth(objetoLogin[0]);
     }
   }
  
@@ -87,9 +93,8 @@ class Login extends Component {
 
 
   render() {
-    const  redirect  = this.state.isLoged;
-    console.log(redirect)
-    if (!redirect) {
+    
+    
       return (
         <body  className="bodyLogin">
         <form className="text-center" onSubmit={e => { e.preventDefault(); }}>
@@ -100,25 +105,24 @@ class Login extends Component {
           <input type="text" id="inputEmail" className="form-control" placeholder="Usuario" required autofocus onChange={event => this.onChange(event)}/>
           <label for="inputPassword" className="sr-only">Contraseña</label>
           <input type="password" id="inputPassword" className="form-control" onChange={event => this.hashearPassword(event)} placeholder="Contraseña" required />
-          <div className="checkbox mb-3">
+          {/* <div className="checkbox mb-3">
             <label>
               <input type="checkbox" value="remember-me"/> Remember me
             </label>
-          </div>
+          </div> */}
           
-          <Link to="/admin"><button className="btn btn-lg btn-primary btn-block botonSignIn" type="submit" onClick={this.login}>Iniciar Sesión</button></Link>
+          {/* <Link to="/admin/dashboard"> */}
+            <button className="btn btn-lg btn-primary btn-block botonSignIn" type="submit" onClick={this.login}>Iniciar Sesión</button>
+            
+          {/* </Link> */}
           <p className="mt-5 mb-3 text-muted leyenda">&copy; 2020</p>
         </div>
       </form>
       </body>
       
       );
-    }
-    else{
-      return <Router>
-      <Redirect push to="/admin" />
-    </Router>
-    }
+    
+    
     
   }
 }

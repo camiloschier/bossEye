@@ -38,34 +38,23 @@ class DetalleEventos extends Component {
       posts: [],
       currentPosts: [],
       isLoaded: false,
+      hayDatos: true
     }
     this.handleChangePorPagina = this.handleChangePorPagina.bind(this)
     this.handleClose = this.handleClose.bind(this);
+    this.handleShow = this.handleShow.bind(this);
     this.cambiarPagina = this.cambiarPagina.bind(this)
   }
   
   
   componentDidMount(){
-    
+    let user = JSON.parse(localStorage.getItem('user'))
+    this.setState({linkFotos: user.link_fotos})
     //console.log("SE HACE LA PETICION API")
     this.getDatosDetalleEventos();
   }
 
-  obtenerURLfotos(){
-    //var fechaHoy = moment().format("YYYY-MM-DD");
-    
-    console.log("SE HACE LA PETICION API")
-    var url = "http://chaco.teledirecto.com:3003/login/juanm/011c945f30ce2cbafc452f39840f025693339c42/s"
-    fetch(url)
-        .then(res => res.json())
-        .then((data) => {
-          console.log("DATOS API SESION", data)
-          this.setState({urlFotos: data.link_fotos})
-          
-        })
-        .catch(console.log)
-    
-  }
+ 
 
   handleChange = date => {
     this.setState({
@@ -76,7 +65,13 @@ class DetalleEventos extends Component {
   async getDatosDetalleEventos(){
     console.log("GET DETALLE")
     let respuestaApi = await this.peticionApi();
-    
+    if (respuestaApi.length == 0) {
+      this.setState({hayDatos: false, isLoaded:true})
+      return
+    }
+    else{
+      this.setState({hayDatos: true})
+    }
     let arrayJsx = [];
     const indexOfLastPost = this.state.currentPage * this.state.postsPerPage;
     const indexOfFirstPost = indexOfLastPost - this.state.postsPerPage;
@@ -105,8 +100,8 @@ class DetalleEventos extends Component {
       var horaHasta = fechaHoraHasta
     }
       
-    
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fechaHoy+"/"+horaDesde+"/"+fechaHoy+"/"+horaHasta+"/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    let user = JSON.parse(localStorage.getItem('user'))
+    var url = "http://chaco.teledirecto.com:3003/tdr/"+fechaHoy+"/"+horaDesde+"/"+fechaHoy+"/"+horaHasta+"/"+user.user+"/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
     //  
     const fetchData = fetch(url)
     .then(res => res.json())
@@ -129,6 +124,13 @@ class DetalleEventos extends Component {
 
 
     let respuestaApi = await this.peticionApi(fecha1);
+    if (respuestaApi.length == 0) {
+      this.setState({hayDatos: false})
+      return
+    }
+    else{
+      this.setState({hayDatos: true})
+    }
     console.log("respuesta api",respuestaApi)
     this.setState({ posts: respuestaApi })
     let arrayJsx = [];
@@ -157,7 +159,14 @@ class DetalleEventos extends Component {
     // console.log("FECHA 1",fecha1);
     // console.log("FECHA 2",fecha2);
     let respuestaApi = await this.peticionApi(fecha1, hora1,hora2);
-    console.log("respuesta api",respuestaApi)
+    if (respuestaApi.length == 0) {
+      this.setState({hayDatos: false})
+      return
+    }
+    else{
+      this.setState({hayDatos: true})
+    }
+    //console.log("respuesta api",respuestaApi)
 
     this.setState({ posts: respuestaApi })
     let arrayJsx = [];
@@ -177,17 +186,17 @@ class DetalleEventos extends Component {
     console.log("HORA 1", hora1);
     // console.log("HORA 1", hora2);
 
-    var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha1+"/"+hora1+"/"+fecha1+"/"+hora2+"/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
-    fetch(url)
-        .then(res => res.json())
-        .then((data) => {
-          this.setState({ detalle: data })
+    // var url = "http://chaco.teledirecto.com:3003/tdr/"+fecha1+"/"+hora1+"/"+fecha1+"/"+hora2+"/juanm/89e495e7941cf9e40e6980d14a16bf023ccd4c91"
+    // fetch(url)
+    //     .then(res => res.json())
+    //     .then((data) => {
+    //       this.setState({ detalle: data })
           
-        })
-        .then(() => {
-          console.log("PEticion por hora")
-        })
-        .catch(console.log)
+    //     })
+    //     .then(() => {
+    //       console.log("PEticion por hora")
+    //     })
+    //     .catch(console.log)
   }
 
   localizarFecha(fecha, timezone,formato){
@@ -320,7 +329,7 @@ class DetalleEventos extends Component {
             
                
             <Row>
-            <Posts posts={this.state.currentPosts} loading={!this.state.isLoaded}/>
+            <Posts hayDatos={this.state.hayDatos} posts={this.state.currentPosts} loading={!this.state.isLoaded} handleShow={this.handleShow}/>
               
 
             </Row>

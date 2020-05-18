@@ -25,8 +25,16 @@ import {
 import { NavItem, Nav, NavDropdown, MenuItem } from "react-bootstrap";
 
 class AdminNavbarLinks extends Component {
+  constructor(props) {
+    super(props);
+    //this.mobileSidebarToggle = this.mobileSidebarToggle.bind(this);
+    this.cerrarSesion = this.cerrarSesion.bind(this)
+  }
+
   cerrarSesion(){
-    alert("CerrarSesion")
+    
+    this.props.handleLogout();
+    this.props.history.push("/loginScreen");
   }
   render() {
     const notification = (
@@ -38,7 +46,7 @@ class AdminNavbarLinks extends Component {
       </div>
     );
     //aca esta la funcion que desloguea
-    const hello = () => {return alert("hola")}
+    const hello = () => {localStorage.setItem('login', false)}
     return (
       <div>
         <Nav 
@@ -84,7 +92,7 @@ class AdminNavbarLinks extends Component {
           </NavDropdown> */}
           {/* ESTE LINK TE LLEVA A LA LOGIN Y ANTES TE HACE EL ONCLICK */}
           <NavItem >
-            <Link to="/loginScreen" onClick={hello}>Cerrar Sesion</Link>
+            <a onClick={this.cerrarSesion}>Cerrar Sesion</a>
           </NavItem>
         </Nav>
         

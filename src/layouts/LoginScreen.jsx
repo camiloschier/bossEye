@@ -36,6 +36,7 @@ class LoginScreen extends Component {
       hasImage: true,
       fixedClasses: "dropdown show-dropdown open"
     };
+    this.handleSucessfullAuth = this.handleSucessfullAuth.bind(this);
   }
   handleNotificationClick = position => {
     var color = Math.floor(Math.random() * 4 + 1);
@@ -117,6 +118,10 @@ class LoginScreen extends Component {
 //       this.setState({ fixedClasses: "dropdown" });
 //     }
 //   };
+  handleSucessfullAuth(data){
+    this.props.handleLogin(data);
+    this.props.history.push("/admin");
+  }
   componentDidMount() {
     this.setState({ _notificationSystem: this.refs.notificationSystem });
     // //var _notificationSystem = this.refs.notificationSystem;
@@ -168,30 +173,9 @@ class LoginScreen extends Component {
   render() {
     return (
       <>
-          {/* //<Switch>{this.getRoutes(routes)}</Switch> */}
-          <Login/>          
-        {/* <NotificationSystem ref="notificationSystem" style={style} />
-        <Sidebar {...this.props} routes={routes} image={this.state.image}
-        color={this.state.color}
-        hasImage={this.state.hasImage}/>
-        <div id="main-panel" className="main-panel" ref="mainPanel">
-          <AdminNavbar
-            {...this.props}
-            brandText={this.getBrandText(this.props.location.pathname)}
-          />
-          <Switch>{this.getRoutes(routes)}</Switch>
-          <Footer /> 
-          <FixedPlugin
-            handleImageClick={this.handleImageClick}
-            handleColorClick={this.handleColorClick}
-            handleHasImage={this.handleHasImage}
-            bgColor={this.state["color"]}
-            bgImage={this.state["image"]}
-            mini={this.state["mini"]}
-            handleFixedClick={this.handleFixedClick}
-            fixedClasses={this.state.fixedClasses}
-          />
-        </div> */}
+
+          <Login handleSucessfullAuth={this.handleSucessfullAuth}/>   
+        
       </>
     );
   }

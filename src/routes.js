@@ -26,27 +26,28 @@ import Upgrade from "views/Upgrade.jsx";
 import Login from "views/Login";
 const dashboardRoutes = [
   {
-    path: "/detalleEventos",
-    name: "Detalle Eventos",
-    icon: "pe-7s-news-paper",
-    component: DetalleEventos,
-    layout: "/admin"
-  },
-  {
     path: "/dashboard",
     name: "Reportes",
     icon: "pe-7s-graph",
     component: Dashboard,
     layout: "/admin"
   },
-  
   {
-    path: "/LoginScreen",
-    name: "Login",
-    icon: "pe-7s-user",
-    component: Login,
-    layout: "/loginScreen"
+    path: "/detalleEventos",
+    name: "Detalle Eventos",
+    icon: "pe-7s-news-paper",
+    component: DetalleEventos,
+    layout: "/admin"
   },
+  
+  
+  // {
+  //   path: "/LoginScreen",
+  //   name: "Login",
+  //   icon: "pe-7s-user",
+  //   component: Login,
+  //   layout: "/loginScreen"
+  // },
   // {
   //   path: "/table",
   //   name: "Lista Usuarios",

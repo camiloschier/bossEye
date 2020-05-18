@@ -180,6 +180,7 @@ class Admin extends Component {
           <AdminNavbar
             {...this.props}
             brandText={this.getBrandText(this.props.location.pathname)}
+            handleLogout={this.props.handleLogout}
           />
           <Switch>{this.getRoutes(routes)}</Switch>
           {/* <Footer /> */}
