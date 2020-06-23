@@ -43,6 +43,11 @@ import {
   responsiveBar,
   legendBar
 } from "variables/Variables.jsx";
+
+// var moment = require('moment');
+import moment from 'moment'
+import 'moment/locale/es'  // without this line it didn't work
+moment.locale('es');
 registerLocale("es", es);
 let data = [
   {
@@ -69,7 +74,6 @@ const CustomizedLabel = createReactClass({
 
 
 
-var moment = require('moment');
 let dataPie = {
   labels: ["40%", "50%", "10%"],
   series: [40, 50, 10]
@@ -104,6 +108,7 @@ class Dashboard extends Component {
   }
  
   createLegend(json) {
+    console.log("JSON", json)
     var legend = [];
     for (var i = 0; i < json["names"].length; i++) {
       var type = "fa fa-circle text-" + json["types"][i];
@@ -112,7 +117,7 @@ class Dashboard extends Component {
       // legend.push(json["names"][i]);
     }
 
-    console.log("LEYENDA", legend)
+    // console.log("LEYENDA", legend)
     return legend;
 
   }
@@ -129,7 +134,7 @@ class Dashboard extends Component {
    
 
     let fecha = moment().format("YYYY-MM-DD");
-    console.log()
+    
     this.getDatosDiarios(fecha);
     this.getDatosHora(fecha);
     //this.cargarChart();
@@ -139,6 +144,7 @@ class Dashboard extends Component {
   async buscarPorFecha(fecha){
 
     this.setState({elementosHora:[],isLoading: true})
+    //Con la promesa hacemos un timeout, para hacer las transiciones mas suaves
     await new Promise(resolve => setTimeout(resolve, 1500));
     this.getDatosDiarios(fecha);
     this.getDatosHora(fecha);
@@ -233,12 +239,13 @@ class Dashboard extends Component {
     // console.log(fechaActual)
     let arrayDatos = await this.peticionApi(fechaActual);
 
-    console.log("ARRAY DATOS", arrayDatos)
+    //console.log("ARRAY DATOS", arrayDatos)
     //a partir de aca calculo diferencia entre las horas
     if (arrayDatos.length == 0) {
       this.setState({hayDatos: false, isLoaded:true})
       return
     }
+    
     let primerHora = moment(arrayDatos[0].fecha).format("HH:mm")
     //console.log("Primer hora",primerHora)
     let ultimaHora = moment(arrayDatos[arrayDatos.length-1].fecha).format("HH:mm")
@@ -253,7 +260,7 @@ class Dashboard extends Component {
     //console.log(horasEnArray)
     
     let copiaArrayDatos = arrayDatos
-    
+    // console.log("arrayDatos",arrayDatos)
     for (let index = 0; index < horasEnArray; index++) {
       
       let arrayDatosHora = arrayDatos.slice(0,59)
@@ -296,6 +303,7 @@ class Dashboard extends Component {
         
         cantidades.push(pruebas.length)
       }
+      //console.log("CANTIDADES", cantidades)
       //cuento cuantos items hay en todo el arreglo
       let sumaCantidades = 0;
       cantidades.forEach(item => sumaCantidades += item)
@@ -314,14 +322,17 @@ class Dashboard extends Component {
         labels: etiquetasPorcentaje,
         series: cantidades
       };
-      console.log("Objeto datos hora", objetoDatosHora)
-  
+      // console.log("Objeto datos hora", objetoDatosHora)
+      // etiquetas = etiquetas.sort()
+      //types me define la clase que luego define el color
+      
       let legendDatosHora = {
         names: etiquetas,
-        types: ["info", "danger", "warning"]
+        types: ["danger", "info", "warning"]
       };
+      console.log("LEGENDDATOSHORA", legendDatosHora)
       let key = index
-      this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0].fecha.substr(11,8),key)
+      this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0].fecha.substr(11,8),key, arrayDatosHora[0].fecha, arrayDatosHora.slice(-1)[0].fecha)
 
 
 
@@ -333,6 +344,8 @@ class Dashboard extends Component {
 
 
       }
+
+      
   }
 
   renderHora2(){
@@ -361,12 +374,30 @@ class Dashboard extends Component {
       // </BarChart>
   }
 
+  localizarFechaYredondear(fecha, timezone,formato){
+    let fechaLocal = moment(fecha).utc();
+    let desviacion = parseInt(timezone);
+  
+    // console.log("Fecha:", fechaLocal.format('DD-MM-YYYY, HH:mm') + " TimeZone: ", desviacion)
+  
+    // console.log("SUMA",fechaLocal.add(desviacion, 'hours').format('DD-MM-YYYY, HH:mm'))
 
-  renderHora(objetoData,leyendaData, horaInicio, horaFin, key){
-    let m = moment(horaInicio);
-    console.log("m", horaInicio)
-    let roundDown = m.startOf('hour');
-    console.log("roundDown", roundDown)
+    return fechaLocal.add(desviacion, 'hours').format(formato)
+  }
+
+
+  renderHora(objetoData,leyendaData, horaInicio, horaFin, key,fechaInicio,fechaFin){
+    //let m = moment(horaInicio);
+    // let m = moment(fechaInicio);
+    // let roundDown = m.startOf('hour');
+    // console.log("HoraInicio", roundDown.toString())
+
+    //console.log("fechaFin",fechaFin)
+    //console.log("fechaFin redondeada",moment(fechaFin).endOf('hour').add(3,'hours').toString().substr(15,6))
+    moment(fechaInicio).startOf('hour').add(3,'hours').toString().substr(15,6)
+
+    // console.log("ARRAYS",objetoData)
+    
     this.state.elementosHora.push(
       <Col md={4} lg={4} key={key}>
       <div
@@ -382,7 +413,7 @@ class Dashboard extends Component {
                 // stats="Campaign sent 2 days ago"
                 content={
                   <>
-                      <div className="titulo-reporte">{horaInicio.substr(0,5)} - {horaFin.substr(0,5)}</div>
+                      <div className="titulo-reporte">{moment(fechaInicio).startOf('hour').add(3,'hours').toString().substr(15,6)} - {moment(fechaFin).endOf('hour').add(3,'hours').toString().substr(15,6)}</div>
 
                   <div style={{display:'flex', justifyContent:'center'}}>
                   
@@ -396,7 +427,11 @@ class Dashboard extends Component {
                       className="ct-chart ct-perfect-fourth"
                     >
                       
-                      <ChartistGraph data={objetoData} type="Pie"/>
+                      <ChartistGraph  data={objetoData} 
+                                        options={{
+                                            
+                                          }} 
+                                        type="Pie"/>
                       {/* {this.createLegend(this.state.legendDatosDiarios)} */}
                     </div>
                   </div>
@@ -415,7 +450,7 @@ class Dashboard extends Component {
 
 
     this.setState({flagHora: true, isLoading: false})
-    console.log("ELEMENTOS HORA", this.state.elementosHora)
+    // console.log("ELEMENTOS HORA", this.state.elementosHora)
     
   }
   peticionApi(fecha){
@@ -541,8 +576,8 @@ class Dashboard extends Component {
               <Col md={12}>
               <Col md={12}>
                   <div>
-                      <div className="titulo-reporte">Reporte por horas</div>
-                      <div className="nombre-usuario-reporte">Usuario: Camilo Perona </div>
+                      <div className="titulo-reporte">Reporte por horas - {moment(this.state.startDate).lang("ES").format('LL')}</div>
+                      <div className="nombre-usuario-reporte">Usuario: {this.state.nombreUsuario} </div>
 
                       {
                         this.state.hayDatos ?
