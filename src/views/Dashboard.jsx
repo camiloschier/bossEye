@@ -96,7 +96,7 @@ class Dashboard extends Component {
       datosApi: [],
 
       //DatePicker
-      startDate: new Date(),
+      startDate: new Date("May 14, 2020"),
       isLoaded: false,
       isLoading:false,
       elementosHora: [],
@@ -108,7 +108,7 @@ class Dashboard extends Component {
   }
  
   createLegend(json) {
-    console.log("JSON", json)
+    //console.log("JSON", json)
     var legend = [];
     for (var i = 0; i < json["names"].length; i++) {
       var type = "fa fa-circle text-" + json["types"][i];
@@ -245,9 +245,62 @@ class Dashboard extends Component {
       this.setState({hayDatos: false, isLoaded:true})
       return
     }
+    //obtengo la hora de base del primero, esta en formato +0 GMT
+    let horaInicioPrimerElementoArray = moment(arrayDatos[0].fecha).add(3,'hours')
+    // ahora tengo que juntar todos los datos que sean menores a la primer hora y 59 min y 59 seg
     
-    let primerHora = moment(arrayDatos[0].fecha).format("HH:mm")
-    //console.log("Primer hora",primerHora)
+    let horaFinPrimerElemento = moment(arrayDatos[0].fecha).minutes(59).seconds(59)
+    // console.log("Primer hora final",horaInicioPrimerElementoArray)
+    // console.log("Primer hora final",horaFinPrimerElemento)
+
+    // con horafin primer elemento tengo que hacer un ciclo for y capturar 
+    // todos los elementos que sean mayores a horaInicioPrimerElementoArray y menores a
+    // horaFinPrimerElemento, luego incrementar una hora hasta la hora fin
+    let subArray = []
+    let subArrayTemp = []
+    for (const iterator of arrayDatos) {
+      //si los elementos estan entre horainicio y hora fin, meterlos a un array
+      
+      if( (horaFinPrimerElemento.isAfter(moment(iterator.fecha),'seconds')) ){
+        //console.log(iterator)
+        //con este itero sobre los que no mete
+        //console.log("subArrayTemp",subArrayTemp.filter(el =>  (horaFinPrimerElemento.isAfter(moment(el.fecha),'seconds') ) ) )
+        // horaFinPrimerElemento.subtract(1,'minute')
+        //console.log(moment(iterator.fecha).toString())
+        subArray.push(iterator)
+        console.log("SubArrayHora",subArray)
+
+        //En el subarray tengo todos los datos de una hora
+      }
+      
+      else{
+        //console.log("subarray",subArray)
+        //console.log("subArrayTemp",subArrayTemp)
+        
+        console.log(iterator.id,"NO ES ANTERIOR A HORAFIN",moment(iterator.fecha).utc().toString())
+        console.log("HORA FIN PRIMER ELEMENTO",horaFinPrimerElemento.utc().toString())
+        //puedo capturar los que no entran, en un array temporal
+        
+        console.log("SubArrayHora",subArray)
+        
+        subArray = []
+        horaFinPrimerElemento = horaFinPrimerElemento.add(1,'hour')
+      }
+      
+    //aca ya puedo armar las horas, se salta 2 o 3 elementos
+
+
+    }
+
+
+    
+    
+    
+    
+    
+    
+    
+    
     let ultimaHora = moment(arrayDatos[arrayDatos.length-1].fecha).format("HH:mm")
     
     //console.log("Ultima hora",ultimaHora)
@@ -330,7 +383,7 @@ class Dashboard extends Component {
         names: etiquetas,
         types: ["danger", "info", "warning"]
       };
-      console.log("LEGENDDATOSHORA", legendDatosHora)
+      //console.log("LEGENDDATOSHORA", legendDatosHora)
       let key = index
       this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0].fecha.substr(11,8),key, arrayDatosHora[0].fecha, arrayDatosHora.slice(-1)[0].fecha)
 
@@ -374,7 +427,7 @@ class Dashboard extends Component {
       // </BarChart>
   }
 
-  localizarFechaYredondear(fecha, timezone,formato){
+  localizarFecha(fecha, timezone,formato){
     let fechaLocal = moment(fecha).utc();
     let desviacion = parseInt(timezone);
   
