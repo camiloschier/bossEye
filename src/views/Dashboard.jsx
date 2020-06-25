@@ -231,93 +231,13 @@ class Dashboard extends Component {
 
   }
   
-  async getDatosHora(fecha){
-    //MODIFICAR FUNCION PARA QUE A PARTIR DE LA HORA INICIO Y HORA FIN CALCULE LAS HORAS Y CICLE CADA UNA HORA DE ESO
-   
-    let fechaActual = moment(fecha).format("YYYY-MM-DD");
-    // console.log("Se ejecuto getdatoshras en fecha",moment(fecha).format("HH:mm"))
-    // console.log(fechaActual)
-    let arrayDatos = await this.peticionApi(fechaActual);
-
-    //console.log("ARRAY DATOS", arrayDatos)
-    //a partir de aca calculo diferencia entre las horas
-    if (arrayDatos.length == 0) {
-      this.setState({hayDatos: false, isLoaded:true})
-      return
-    }
-    //obtengo la hora de base del primero, esta en formato +0 GMT
-    let horaInicioPrimerElementoArray = moment(arrayDatos[0].fecha).add(3,'hours')
-    // ahora tengo que juntar todos los datos que sean menores a la primer hora y 59 min y 59 seg
+  armarObjetoYLeyendaHora(array){
     
-    let horaFinPrimerElemento = moment(arrayDatos[0].fecha).minutes(59).seconds(59)
-    // console.log("Primer hora final",horaInicioPrimerElementoArray)
-    // console.log("Primer hora final",horaFinPrimerElemento)
-
-    // con horafin primer elemento tengo que hacer un ciclo for y capturar 
-    // todos los elementos que sean mayores a horaInicioPrimerElementoArray y menores a
-    // horaFinPrimerElemento, luego incrementar una hora hasta la hora fin
-    let subArray = []
-    let subArrayTemp = []
-    for (const iterator of arrayDatos) {
-      //si los elementos estan entre horainicio y hora fin, meterlos a un array
+    console.log("ARMAROBJETO")
+    for (let index = 0; index < array.length; index++) {
       
-      if( (horaFinPrimerElemento.isAfter(moment(iterator.fecha),'seconds')) ){
-        //console.log(iterator)
-        //con este itero sobre los que no mete
-        //console.log("subArrayTemp",subArrayTemp.filter(el =>  (horaFinPrimerElemento.isAfter(moment(el.fecha),'seconds') ) ) )
-        // horaFinPrimerElemento.subtract(1,'minute')
-        //console.log(moment(iterator.fecha).toString())
-        subArray.push(iterator)
-        console.log("SubArrayHora",subArray)
-
-        //En el subarray tengo todos los datos de una hora
-      }
-      
-      else{
-        //console.log("subarray",subArray)
-        //console.log("subArrayTemp",subArrayTemp)
-        
-        console.log(iterator.id,"NO ES ANTERIOR A HORAFIN",moment(iterator.fecha).utc().toString())
-        console.log("HORA FIN PRIMER ELEMENTO",horaFinPrimerElemento.utc().toString())
-        //puedo capturar los que no entran, en un array temporal
-        
-        console.log("SubArrayHora",subArray)
-        
-        subArray = []
-        horaFinPrimerElemento = horaFinPrimerElemento.add(1,'hour')
-      }
-      
-    //aca ya puedo armar las horas, se salta 2 o 3 elementos
-
-
-    }
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    let ultimaHora = moment(arrayDatos[arrayDatos.length-1].fecha).format("HH:mm")
-    
-    //console.log("Ultima hora",ultimaHora)
-
-    
-    //console.log("arrayDatos",arrayDatos)
-    //divido el array en 60
-    let horasEnArray = Math.ceil(arrayDatos.length / 60)
-    
-    //console.log(horasEnArray)
-    
-    let copiaArrayDatos = arrayDatos
-    // console.log("arrayDatos",arrayDatos)
-    for (let index = 0; index < horasEnArray; index++) {
-      
-      let arrayDatosHora = arrayDatos.slice(0,59)
-      // console.log("ARRAY HORA", arrayDatosHora)
+      //let arrayDatosHora = arrayDatos.slice(0,59)
+      //console.log("ARRAY HORA", array)
       //obtengo primer hora array
       //console.log("PRIMER HORA", )
       
@@ -326,8 +246,8 @@ class Dashboard extends Component {
       //devuelvo para a partir de eso generar los reportes de cada una
       let etiquetas = []
 
-      for (let index = 0; index < arrayDatosHora.length; index++) {
-        const element = arrayDatosHora[index];
+      for (let index = 0; index < array.length; index++) {
+        const element = array[index];
 
         let calificacion = element.calificacion;
         let valor = 1;
@@ -351,9 +271,8 @@ class Dashboard extends Component {
       let cantidades =[]
       //2do recorro el array original y cuento cantidades
       for (let index = 0; index < etiquetas.length; index++) {
-        // console.log("ETIQUETA ES", etiquetas[index])
-        let pruebas = arrayDatos.filter(elem => elem.calificacion == etiquetas[index])
-        
+        //console.log("ETIQUETA ES", etiquetas[index])
+        let pruebas = array.filter(elem => elem.calificacion == etiquetas[index])  
         cantidades.push(pruebas.length)
       }
       //console.log("CANTIDADES", cantidades)
@@ -375,7 +294,7 @@ class Dashboard extends Component {
         labels: etiquetasPorcentaje,
         series: cantidades
       };
-      // console.log("Objeto datos hora", objetoDatosHora)
+      console.log("Objeto datos hora", objetoDatosHora)
       // etiquetas = etiquetas.sort()
       //types me define la clase que luego define el color
       
@@ -383,20 +302,178 @@ class Dashboard extends Component {
         names: etiquetas,
         types: ["danger", "info", "warning"]
       };
-      //console.log("LEGENDDATOSHORA", legendDatosHora)
+      console.log("LEGENDDATOSHORA", legendDatosHora)
       let key = index
-      this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0].fecha.substr(11,8),key, arrayDatosHora[0].fecha, arrayDatosHora.slice(-1)[0].fecha)
+      //this.renderHora(objetoDatosHora,legendDatosHora,array[0].fecha.substr(11,8),array.slice(-1)[0].fecha.substr(11,8),key, array[0].fecha, array.slice(-1)[0].fecha)
 
 
 
       //lo elimino una vez que realice los datos
-      arrayDatos.splice(0,59)
+      // arrayDatos.splice(0,59)
       
       // console.log("NUEVO ARRAY",arrayDatos)
       // console.log("ETIQUETAS HORA", etiquetas)
 
 
       }
+  }
+  async getDatosHora(fecha){
+    
+    let fechaActual = moment(fecha).format("YYYY-MM-DD");
+    let arrayDatos = await this.peticionApi(fechaActual);
+
+    //a partir de aca calculo diferencia entre las horas
+    if (arrayDatos.length == 0) {
+      this.setState({hayDatos: false, isLoaded:true})
+      return
+    }
+    //obtengo la hora de base del primero, esta en formato +0 GMT
+    let horaInicioPrimerElementoArray = moment(arrayDatos[0].fecha).add(3,'hours')
+    // ahora tengo que juntar todos los datos que sean menores a la primer hora y 59 min y 59 seg
+    
+    let horaFinPrimerElemento = moment(arrayDatos[0].fecha).minutes(59).seconds(59)
+    
+    // con horafin primer elemento tengo que hacer un ciclo for y capturar 
+    // todos los elementos que sean mayores a horaInicioPrimerElementoArray y menores a
+    // horaFinPrimerElemento, luego incrementar una hora hasta la hora fin
+    let subArray = []
+    let subArrayTemp = []
+    for (const iterator of arrayDatos) {
+      //si los elementos estan entre horainicio y hora fin, meterlos a un array
+      
+      if( (horaFinPrimerElemento.isAfter(moment(iterator.fecha),'seconds')) ){
+        
+        //con este itero sobre los que no mete
+        
+        
+        
+        subArray.push(iterator)
+       
+
+        //En el subarray tengo todos los datos de una hora
+      }
+      
+      else{
+        
+        //puedo capturar los que no entran, en un array temporal
+        
+        //console.log("SubArrayHora",subArray)
+        
+        //aca paso la funcion para armar objetoshora y leyendahora
+        console.log("PREVIO ARMAR")
+        this.armarObjetoYLeyendaHora(subArray)
+        subArray = []
+        horaFinPrimerElemento = horaFinPrimerElemento.add(1,'hour')
+      }
+      
+    //aca ya puedo armar las horas, se salta 2 o 3 elementos
+
+    }
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    // let ultimaHora = moment(arrayDatos[arrayDatos.length-1].fecha).format("HH:mm")
+    
+    // //console.log("Ultima hora",ultimaHora)
+
+    
+    // //console.log("arrayDatos",arrayDatos)
+    // //divido el array en 60
+    // let horasEnArray = Math.ceil(arrayDatos.length / 60)
+    
+    // //console.log(horasEnArray)
+    
+    // // console.log("arrayDatos",arrayDatos)
+    // for (let index = 0; index < horasEnArray; index++) {
+      
+    //   let arrayDatosHora = arrayDatos.slice(0,59)
+    //   // console.log("ARRAY HORA", arrayDatosHora)
+    //   //obtengo primer hora array
+    //   //console.log("PRIMER HORA", )
+      
+
+    //   //a partir de esto genero las etiquetas y labels necesarios
+    //   //devuelvo para a partir de eso generar los reportes de cada una
+    //   let etiquetas = []
+
+    //   for (let index = 0; index < arrayDatosHora.length; index++) {
+    //     const element = arrayDatosHora[index];
+
+    //     let calificacion = element.calificacion;
+    //     let valor = 1;
+    //     //chequeo si el elemento está en el array, si no está lo añado
+    //     if (!etiquetas.includes(element.calificacion)) {
+    //       if (element.calificacion == null) {
+    //         element.calificacion = "Desconocido"
+            
+    //         if(etiquetas.indexOf("Desconocido") == -1)
+    //           {
+    //             etiquetas.push(element.calificacion)
+    //           }
+    //       }
+    //       else{
+    //         etiquetas.push(element.calificacion)
+    //       }
+          
+    //     }
+
+    //   }
+    //   let cantidades =[]
+    //   //2do recorro el array original y cuento cantidades
+    //   for (let index = 0; index < etiquetas.length; index++) {
+    //     // console.log("ETIQUETA ES", etiquetas[index])
+    //     let pruebas = arrayDatos.filter(elem => elem.calificacion == etiquetas[index])
+        
+    //     cantidades.push(pruebas.length)
+    //   }
+    //   //console.log("CANTIDADES", cantidades)
+    //   //cuento cuantos items hay en todo el arreglo
+    //   let sumaCantidades = 0;
+    //   cantidades.forEach(item => sumaCantidades += item)
+    //   // console.log("Cantidad items",sumaCantidades)
+
+    //   //calculo el porcentaje que representa cada elemento del array 
+    //   let etiquetasPorcentaje = []
+    //   cantidades.forEach(item => etiquetasPorcentaje.push(String(Math.round(item*100/sumaCantidades))+"%"))
+    //   // console.log("Cantidades", cantidades);
+    //   // console.log("Etiquetas Porcentaje", etiquetasPorcentaje);
+
+    //   //ahora que tengo los datos, deberia armar el objeto y pasarselo a una funcion que lo renderee
+      
+
+    //   let objetoDatosHora = {
+    //     labels: etiquetasPorcentaje,
+    //     series: cantidades
+    //   };
+    //   // console.log("Objeto datos hora", objetoDatosHora)
+    //   // etiquetas = etiquetas.sort()
+    //   //types me define la clase que luego define el color
+      
+    //   let legendDatosHora = {
+    //     names: etiquetas,
+    //     types: ["danger", "info", "warning"]
+    //   };
+    //   //console.log("LEGENDDATOSHORA", legendDatosHora)
+    //   let key = index
+    //   this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0].fecha.substr(11,8),key, arrayDatosHora[0].fecha, arrayDatosHora.slice(-1)[0].fecha)
+
+
+
+    //   //lo elimino una vez que realice los datos
+    //   arrayDatos.splice(0,59)
+      
+    //   // console.log("NUEVO ARRAY",arrayDatos)
+    //   // console.log("ETIQUETAS HORA", etiquetas)
+
+
+    //   }
 
       
   }
