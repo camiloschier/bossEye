@@ -96,7 +96,7 @@ class Dashboard extends Component {
       datosApi: [],
 
       //DatePicker
-      startDate: new Date("May 14, 2020"),
+      startDate: new Date(),
       isLoaded: false,
       isLoading:false,
       elementosHora: [],
@@ -108,7 +108,7 @@ class Dashboard extends Component {
   }
  
   createLegend(json) {
-    console.log("JSON", json)
+    //console.log("JSON", json)
     
     let legend = [];
     for (let index = 0; index < json["names"].length; index++) {
@@ -295,7 +295,7 @@ class Dashboard extends Component {
       series: cantidades
     };
 
-    console.log("Etiquetas", etiquetas)
+    //console.log("Etiquetas", etiquetas)
     let legendDatosHora = {
       names: etiquetas,
       types: ["danger", "info", "warning"]
@@ -326,7 +326,7 @@ class Dashboard extends Component {
     // ahora tengo que juntar todos los datos que sean menores a la primer hora y 59 min y 59 seg
     
     let horaFinPrimerElemento = moment(arrayDatos[0].fecha).minutes(59).seconds(59)
-    
+    console.log("HORA FIN PRIMER ELEMN", horaFinPrimerElemento.toString())
     // con horafin primer elemento tengo que hacer un ciclo for y capturar 
     // todos los elementos que sean mayores a horaInicioPrimerElementoArray y menores a
     // horaFinPrimerElemento, luego incrementar una hora hasta la hora fin
@@ -352,7 +352,7 @@ class Dashboard extends Component {
         //puedo capturar los que no entran, en un array temporal
 
         //aca paso la funcion para armar objetoshora y leyendahora
-        //console.log("SubArrayHora",subArray)
+        console.log("SubArrayHora",subArray)
         
         this.armarObjetoYLeyendaHora(subArray)
 

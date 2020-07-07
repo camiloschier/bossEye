@@ -103,7 +103,8 @@ class DetalleEventos extends Component {
       
     let user = JSON.parse(localStorage.getItem('user'))
     var url = "http://chaco.teledirecto.com:3003/tdr/"+fechaHoy+"/"+horaDesde+"/"+fechaHoy+"/"+horaHasta+"/"+user.user+"/"+user.entidad+""
-    //  
+    //
+    console.log("URL",url)
     const fetchData = fetch(url)
     .then(res => res.json())
     .then((data) => {
@@ -160,7 +161,7 @@ class DetalleEventos extends Component {
     // console.log("FECHA 1",fecha1);
     // console.log("FECHA 2",fecha2);
     let respuestaApi = await this.peticionApi(fecha1, hora1,hora2);
-    if (respuestaApi.length == 0) {
+    if (respuestaApi.length == 0 || respuestaApi == undefined) {
       this.setState({hayDatos: false})
       return
     }
@@ -198,6 +199,7 @@ class DetalleEventos extends Component {
     //       console.log("PEticion por hora")
     //     })
     //     .catch(console.log)
+    this.cambiarPagina(1);
   }
 
   localizarFecha(fecha, timezone,formato){
