@@ -108,14 +108,36 @@ class Dashboard extends Component {
   }
  
   createLegend(json) {
-    //console.log("JSON", json)
-    var legend = [];
-    for (var i = 0; i < json["names"].length; i++) {
-      var type = "fa fa-circle text-" + json["types"][i];
-      legend.push(<i className={type} key={i} />," ",json["names"][i]);
-      // legend.push(" ");
-      // legend.push(json["names"][i]);
+    console.log("JSON", json)
+    
+    let legend = [];
+    for (let index = 0; index < json["names"].length; index++) {
+      let name = json["names"][index]
+      switch (name) {
+        case "Desconocido":
+          
+          legend.push(<i className={"fa fa-circle text-warning"} key={index} />," ",name);
+          break;
+        case "Tarea":
+          
+          legend.push(<i className={"fa fa-circle text-info"} key={index} />," ",name);
+          break;
+        case "Distraccion":
+        
+          legend.push(<i className={"fa fa-circle text-danger"} key={index} />," ",name);
+          break;
+          
+        default:
+          break;
+      }
     }
+    // var legend = [];
+    // for (var i = 0; i < json["names"].length; i++) {
+    //   var type = "fa fa-circle text-" + json["types"][i];
+    //   legend.push(<i className={type} key={i} />," ",json["names"][i]);
+    //   // legend.push(" ");
+    //   // legend.push(json["names"][i]);
+    // }
 
     // console.log("LEYENDA", legend)
     return legend;
@@ -137,8 +159,6 @@ class Dashboard extends Component {
     
     this.getDatosDiarios(fecha);
     this.getDatosHora(fecha);
-    //this.cargarChart();
-    //this.buscarPorFecha(fecha)
   }
 
   async buscarPorFecha(fecha){
@@ -233,89 +253,63 @@ class Dashboard extends Component {
   
   armarObjetoYLeyendaHora(array){
     
-    console.log("ARMAROBJETO")
+    let etiquetas = [];
     for (let index = 0; index < array.length; index++) {
       
-      //let arrayDatosHora = arrayDatos.slice(0,59)
-      //console.log("ARRAY HORA", array)
-      //obtengo primer hora array
-      //console.log("PRIMER HORA", )
-      
 
-      //a partir de esto genero las etiquetas y labels necesarios
-      //devuelvo para a partir de eso generar los reportes de cada una
-      let etiquetas = []
+      const element = array[index];
 
-      for (let index = 0; index < array.length; index++) {
-        const element = array[index];
+      if (!etiquetas.includes(element.calificacion)) {
+        if(element.calificacion == null){
+          element.calificacion = "Desconocido"
 
-        let calificacion = element.calificacion;
-        let valor = 1;
-        //chequeo si el elemento está en el array, si no está lo añado
-        if (!etiquetas.includes(element.calificacion)) {
-          if (element.calificacion == null) {
-            element.calificacion = "Desconocido"
-            
-            if(etiquetas.indexOf("Desconocido") == -1)
-              {
-                etiquetas.push(element.calificacion)
-              }
-          }
-          else{
+          if(etiquetas.indexOf("Desconocido") == -1){
             etiquetas.push(element.calificacion)
           }
-          
         }
-
+        else{
+          etiquetas.push(element.calificacion)
+        }
       }
-      let cantidades =[]
-      //2do recorro el array original y cuento cantidades
-      for (let index = 0; index < etiquetas.length; index++) {
-        //console.log("ETIQUETA ES", etiquetas[index])
-        let pruebas = array.filter(elem => elem.calificacion == etiquetas[index])  
-        cantidades.push(pruebas.length)
-      }
-      //console.log("CANTIDADES", cantidades)
-      //cuento cuantos items hay en todo el arreglo
-      let sumaCantidades = 0;
-      cantidades.forEach(item => sumaCantidades += item)
-      // console.log("Cantidad items",sumaCantidades)
+    }
 
-      //calculo el porcentaje que representa cada elemento del array 
-      let etiquetasPorcentaje = []
-      cantidades.forEach(item => etiquetasPorcentaje.push(String(Math.round(item*100/sumaCantidades))+"%"))
-      // console.log("Cantidades", cantidades);
-      // console.log("Etiquetas Porcentaje", etiquetasPorcentaje);
+    let cantidades = [];
+    for (let index = 0; index < etiquetas.length; index++) {
+      //console.log("ETIQUETA ES", etiquetas[index])
+      let pruebas = array.filter(elem => elem.calificacion == etiquetas[index])  
+      cantidades.push(pruebas.length)
+    }
 
-      //ahora que tengo los datos, deberia armar el objeto y pasarselo a una funcion que lo renderee
-      
+    //cuento cuantos items hay en todo el arreglo
+    let sumaCantidades = 0;
+    cantidades.forEach(item => sumaCantidades += item)
 
-      let objetoDatosHora = {
-        labels: etiquetasPorcentaje,
-        series: cantidades
-      };
-      console.log("Objeto datos hora", objetoDatosHora)
-      // etiquetas = etiquetas.sort()
-      //types me define la clase que luego define el color
-      
-      let legendDatosHora = {
-        names: etiquetas,
-        types: ["danger", "info", "warning"]
-      };
-      console.log("LEGENDDATOSHORA", legendDatosHora)
-      let key = index
-      //this.renderHora(objetoDatosHora,legendDatosHora,array[0].fecha.substr(11,8),array.slice(-1)[0].fecha.substr(11,8),key, array[0].fecha, array.slice(-1)[0].fecha)
+    //calculo el porcentaje que representa cada elemento del array 
+    let etiquetasPorcentaje = []
+    cantidades.forEach(item => etiquetasPorcentaje.push(String(Math.round(item*100/sumaCantidades))+"%"))
 
+    //console.log("ETIQUETAS PORCENTAJE FOR ALTERNATIVO", etiquetasPorcentaje)
 
+    let objetoDatosHora = {
+      labels: etiquetasPorcentaje,
+      series: cantidades
+    };
 
-      //lo elimino una vez que realice los datos
-      // arrayDatos.splice(0,59)
-      
-      // console.log("NUEVO ARRAY",arrayDatos)
-      // console.log("ETIQUETAS HORA", etiquetas)
+    console.log("Etiquetas", etiquetas)
+    let legendDatosHora = {
+      names: etiquetas,
+      types: ["danger", "info", "warning"]
+    };
+    //console.log(objetoDatosHora)
+    //console.log(legendDatosHora)
+    if (array.length > 0) {
+      //console.log("RENDERHORA")
+      this.renderHora(objetoDatosHora,legendDatosHora,1, array[0].fecha, array.slice(-1)[0].fecha)
+    }
 
+   
+    
 
-      }
   }
   async getDatosHora(fecha){
     
@@ -337,7 +331,7 @@ class Dashboard extends Component {
     // todos los elementos que sean mayores a horaInicioPrimerElementoArray y menores a
     // horaFinPrimerElemento, luego incrementar una hora hasta la hora fin
     let subArray = []
-    let subArrayTemp = []
+    
     for (const iterator of arrayDatos) {
       //si los elementos estan entre horainicio y hora fin, meterlos a un array
       
@@ -356,12 +350,12 @@ class Dashboard extends Component {
       else{
         
         //puedo capturar los que no entran, en un array temporal
-        
+
+        //aca paso la funcion para armar objetoshora y leyendahora
         //console.log("SubArrayHora",subArray)
         
-        //aca paso la funcion para armar objetoshora y leyendahora
-        console.log("PREVIO ARMAR")
         this.armarObjetoYLeyendaHora(subArray)
+
         subArray = []
         horaFinPrimerElemento = horaFinPrimerElemento.add(1,'hour')
       }
@@ -369,113 +363,7 @@ class Dashboard extends Component {
     //aca ya puedo armar las horas, se salta 2 o 3 elementos
 
     }
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    // let ultimaHora = moment(arrayDatos[arrayDatos.length-1].fecha).format("HH:mm")
-    
-    // //console.log("Ultima hora",ultimaHora)
-
-    
-    // //console.log("arrayDatos",arrayDatos)
-    // //divido el array en 60
-    // let horasEnArray = Math.ceil(arrayDatos.length / 60)
-    
-    // //console.log(horasEnArray)
-    
-    // // console.log("arrayDatos",arrayDatos)
-    // for (let index = 0; index < horasEnArray; index++) {
-      
-    //   let arrayDatosHora = arrayDatos.slice(0,59)
-    //   // console.log("ARRAY HORA", arrayDatosHora)
-    //   //obtengo primer hora array
-    //   //console.log("PRIMER HORA", )
-      
-
-    //   //a partir de esto genero las etiquetas y labels necesarios
-    //   //devuelvo para a partir de eso generar los reportes de cada una
-    //   let etiquetas = []
-
-    //   for (let index = 0; index < arrayDatosHora.length; index++) {
-    //     const element = arrayDatosHora[index];
-
-    //     let calificacion = element.calificacion;
-    //     let valor = 1;
-    //     //chequeo si el elemento está en el array, si no está lo añado
-    //     if (!etiquetas.includes(element.calificacion)) {
-    //       if (element.calificacion == null) {
-    //         element.calificacion = "Desconocido"
-            
-    //         if(etiquetas.indexOf("Desconocido") == -1)
-    //           {
-    //             etiquetas.push(element.calificacion)
-    //           }
-    //       }
-    //       else{
-    //         etiquetas.push(element.calificacion)
-    //       }
-          
-    //     }
-
-    //   }
-    //   let cantidades =[]
-    //   //2do recorro el array original y cuento cantidades
-    //   for (let index = 0; index < etiquetas.length; index++) {
-    //     // console.log("ETIQUETA ES", etiquetas[index])
-    //     let pruebas = arrayDatos.filter(elem => elem.calificacion == etiquetas[index])
-        
-    //     cantidades.push(pruebas.length)
-    //   }
-    //   //console.log("CANTIDADES", cantidades)
-    //   //cuento cuantos items hay en todo el arreglo
-    //   let sumaCantidades = 0;
-    //   cantidades.forEach(item => sumaCantidades += item)
-    //   // console.log("Cantidad items",sumaCantidades)
-
-    //   //calculo el porcentaje que representa cada elemento del array 
-    //   let etiquetasPorcentaje = []
-    //   cantidades.forEach(item => etiquetasPorcentaje.push(String(Math.round(item*100/sumaCantidades))+"%"))
-    //   // console.log("Cantidades", cantidades);
-    //   // console.log("Etiquetas Porcentaje", etiquetasPorcentaje);
-
-    //   //ahora que tengo los datos, deberia armar el objeto y pasarselo a una funcion que lo renderee
-      
-
-    //   let objetoDatosHora = {
-    //     labels: etiquetasPorcentaje,
-    //     series: cantidades
-    //   };
-    //   // console.log("Objeto datos hora", objetoDatosHora)
-    //   // etiquetas = etiquetas.sort()
-    //   //types me define la clase que luego define el color
-      
-    //   let legendDatosHora = {
-    //     names: etiquetas,
-    //     types: ["danger", "info", "warning"]
-    //   };
-    //   //console.log("LEGENDDATOSHORA", legendDatosHora)
-    //   let key = index
-    //   this.renderHora(objetoDatosHora,legendDatosHora,arrayDatosHora[0].fecha.substr(11,8),arrayDatosHora.slice(-1)[0].fecha.substr(11,8),key, arrayDatosHora[0].fecha, arrayDatosHora.slice(-1)[0].fecha)
-
-
-
-    //   //lo elimino una vez que realice los datos
-    //   arrayDatos.splice(0,59)
-      
-    //   // console.log("NUEVO ARRAY",arrayDatos)
-    //   // console.log("ETIQUETAS HORA", etiquetas)
-
-
-    //   }
-
-      
+   
   }
 
   renderHora2(){
@@ -516,7 +404,7 @@ class Dashboard extends Component {
   }
 
 
-  renderHora(objetoData,leyendaData, horaInicio, horaFin, key,fechaInicio,fechaFin){
+  renderHora(objetoData,leyendaData, key,fechaInicio,fechaFin){
     //let m = moment(horaInicio);
     // let m = moment(fechaInicio);
     // let roundDown = m.startOf('hour');
