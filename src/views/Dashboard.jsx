@@ -326,7 +326,7 @@ class Dashboard extends Component {
     // ahora tengo que juntar todos los datos que sean menores a la primer hora y 59 min y 59 seg
     
     let horaFinPrimerElemento = moment(arrayDatos[0].fecha).minutes(59).seconds(59)
-    console.log("HORA FIN PRIMER ELEMN", horaFinPrimerElemento.toString())
+    console.log("HORA FIN PRIMER ELEMN", moment(arrayDatos[0].fecha).minutes(59).seconds(59).utcOffset())
     // con horafin primer elemento tengo que hacer un ciclo for y capturar 
     // todos los elementos que sean mayores a horaInicioPrimerElementoArray y menores a
     // horaFinPrimerElemento, luego incrementar una hora hasta la hora fin
@@ -392,7 +392,7 @@ class Dashboard extends Component {
       // </BarChart>
   }
 
-  localizarFecha(fecha, timezone,formato){
+  localizarFecha(fecha, timezone){
     let fechaLocal = moment(fecha).utc();
     let desviacion = parseInt(timezone);
   
@@ -400,7 +400,7 @@ class Dashboard extends Component {
   
     // console.log("SUMA",fechaLocal.add(desviacion, 'hours').format('DD-MM-YYYY, HH:mm'))
 
-    return fechaLocal.add(desviacion, 'hours').format(formato)
+    return fechaLocal.add(desviacion, 'hours')
   }
 
 
@@ -431,7 +431,7 @@ class Dashboard extends Component {
                 // stats="Campaign sent 2 days ago"
                 content={
                   <>
-                      <div className="titulo-reporte">{moment(fechaInicio).startOf('hour').add(3,'hours').toString().substr(15,6)} - {moment(fechaFin).endOf('hour').add(3,'hours').toString().substr(15,6)}</div>
+                      <div className="titulo-reporte">{moment(fechaInicio).startOf('hour').toString().substr(15,6)} - {moment(fechaFin).endOf('hour').toString().substr(15,6)}</div>
 
                   <div style={{display:'flex', justifyContent:'center'}}>
                   
