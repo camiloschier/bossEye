@@ -22,7 +22,7 @@ import { FormInputs } from "components/FormInputs/FormInputs.jsx";
 import { Card } from "components/Card/Card.jsx";
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
 import { Tasks } from "components/Tasks/Tasks.jsx";
-
+import '../assets/css/styles.css'
 import { css } from "@emotion/core";
 import BeatLoader from "react-spinners/BeatLoader";
 import DatePicker, { registerLocale } from "react-datepicker";
@@ -233,7 +233,7 @@ class Dashboard extends Component {
     //calculo el porcentaje que representa cada elemento del array 
     let etiquetasPorcentaje = []
     cantidades.forEach(item => etiquetasPorcentaje.push(String(Math.round(item*100/sumaCantidades))+"%"))
-    
+    //console.log("cantidades", cantidades)
     let objetoDatosDiarios = {
       labels: etiquetasPorcentaje,
       series: cantidades
@@ -275,7 +275,7 @@ class Dashboard extends Component {
 
     let cantidades = [];
     for (let index = 0; index < etiquetas.length; index++) {
-      //console.log("ETIQUETA ES", etiquetas[index])
+      // console.log("ETIQUETA ES", etiquetas[index])
       let pruebas = array.filter(elem => elem.calificacion == etiquetas[index])  
       cantidades.push(pruebas.length)
     }
@@ -283,6 +283,21 @@ class Dashboard extends Component {
     //cuento cuantos items hay en todo el arreglo
     let sumaCantidades = 0;
     cantidades.forEach(item => sumaCantidades += item)
+    let series2 = []
+    for (let index = 0; index < etiquetas.length; index++) {
+      const etiqueta = etiquetas[index];
+      
+      cantidades.map(item => series2.push({data: item, className:etiqueta}))
+      
+    }
+
+    
+
+    //cantidades.map(item => series2.push({data: item, className:'my-custom-class'}))
+    console.log("etiquetas", etiquetas)
+
+    console.log("cantidades", series2)
+
 
     //calculo el porcentaje que representa cada elemento del array 
     let etiquetasPorcentaje = []
@@ -292,7 +307,7 @@ class Dashboard extends Component {
 
     let objetoDatosHora = {
       labels: etiquetasPorcentaje,
-      series: cantidades
+      series: series2
     };
 
     //console.log("Etiquetas", etiquetas)
@@ -326,7 +341,7 @@ class Dashboard extends Component {
     // ahora tengo que juntar todos los datos que sean menores a la primer hora y 59 min y 59 seg
     
     let horaFinPrimerElemento = moment(arrayDatos[0].fecha).minutes(59).seconds(59)
-    console.log("HORA FIN PRIMER ELEMN", moment(arrayDatos[0].fecha).minutes(59).seconds(59).utcOffset())
+    //console.log("HORA FIN PRIMER ELEMN", moment(arrayDatos[0].fecha).minutes(59).seconds(59).utcOffset())
     // con horafin primer elemento tengo que hacer un ciclo for y capturar 
     // todos los elementos que sean mayores a horaInicioPrimerElementoArray y menores a
     // horaFinPrimerElemento, luego incrementar una hora hasta la hora fin
@@ -352,7 +367,7 @@ class Dashboard extends Component {
         //puedo capturar los que no entran, en un array temporal
 
         //aca paso la funcion para armar objetoshora y leyendahora
-        console.log("SubArrayHora",subArray)
+        //console.log("SubArrayHora",subArray)
         
         this.armarObjetoYLeyendaHora(subArray)
 

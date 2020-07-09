@@ -83,3 +83,30 @@ html {
 .graficoTorta1{
     fill: green
 }
+
+.my-custom-class{
+    fill: hsl(120, 40%, 60%);
+  /* give your pie slices some outline or separate them visually by using the background color here */
+  stroke: white;
+  /* outline width */
+  stroke-width: 4px;
+}
+
+.pie-opcion-1{
+    fill: hsl(120, 40%, 60%);
+    stroke: white;
+  /* outline width */
+    stroke-width: 4px;
+}
+.pie-opcion-2{
+    fill: hsl(0, 64%, 20%);
+    stroke: white;
+  /* outline width */
+    stroke-width: 4px;
+}
+.pie-opcion-3{
+    fill: hsl(246, 65%, 20%);
+    stroke: white;
+  /* outline width */
+    stroke-width: 4px;
+}
