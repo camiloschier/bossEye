@@ -110,34 +110,34 @@ class Dashboard extends Component {
   createLegend(json) {
     //console.log("JSON", json)
     
-    let legend = [];
-    for (let index = 0; index < json["names"].length; index++) {
-      let name = json["names"][index]
-      switch (name) {
-        case "Desconocido":
+    // let legend = [];
+    // for (let index = 0; index < json["names"].length; index++) {
+    //   let name = json["names"][index]
+    //   switch (name) {
+    //     case "Desconocido":
           
-          legend.push(<i className={"fa fa-circle text-warning"} key={index} />," ",name);
-          break;
-        case "Tarea":
+    //       legend.push(<i className={"fa fa-circle text-warning"} key={index} />," ",name);
+    //       break;
+    //     case "Tarea":
           
-          legend.push(<i className={"fa fa-circle text-info"} key={index} />," ",name);
-          break;
-        case "Distraccion":
+    //       legend.push(<i className={"fa fa-circle text-info"} key={index} />," ",name);
+    //       break;
+    //     case "Distraccion":
         
-          legend.push(<i className={"fa fa-circle text-danger"} key={index} />," ",name);
-          break;
+    //       legend.push(<i className={"fa fa-circle text-danger"} key={index} />," ",name);
+    //       break;
           
-        default:
-          break;
-      }
-    }
-    // var legend = [];
-    // for (var i = 0; i < json["names"].length; i++) {
-    //   var type = "fa fa-circle text-" + json["types"][i];
-    //   legend.push(<i className={type} key={i} />," ",json["names"][i]);
-    //   // legend.push(" ");
-    //   // legend.push(json["names"][i]);
+    //     default:
+    //       break;
+    //   }
     // }
+    var legend = [];
+    for (var i = 0; i < json["names"].length; i++) {
+      var type = "fa fa-circle text-" + json["types"][i];
+      legend.push(<i className={type} key={i} />," ",json["names"][i]);
+      // legend.push(" ");
+      // legend.push(json["names"][i]);
+    }
 
     // console.log("LEYENDA", legend)
     return legend;
@@ -215,6 +215,7 @@ class Dashboard extends Component {
 
     let cantidades =[]
     //2do recorro el array original y cuento cantidades
+    etiquetas = etiquetas.sort()
     for (let index = 0; index < etiquetas.length; index++) {
       // console.log("ETIQUETA ES", etiquetas[index])
       let pruebas = arrayDatos.filter(elem => elem.calificacion == etiquetas[index])
@@ -272,31 +273,56 @@ class Dashboard extends Component {
         }
       }
     }
-
     let cantidades = [];
+    etiquetas = etiquetas.sort()
+    //console.log("ETIQUETAS",etiquetas)
     for (let index = 0; index < etiquetas.length; index++) {
-      // console.log("ETIQUETA ES", etiquetas[index])
       let pruebas = array.filter(elem => elem.calificacion == etiquetas[index])  
       cantidades.push(pruebas.length)
+      //console.log(cantidades[index],"DE", etiquetas[index])
+
     }
+    //console.log("CANTIDADES",cantidades)
 
     //cuento cuantos items hay en todo el arreglo
     let sumaCantidades = 0;
     cantidades.forEach(item => sumaCantidades += item)
     let series2 = []
-    for (let index = 0; index < etiquetas.length; index++) {
-      const etiqueta = etiquetas[index];
-      
-      cantidades.map(item => series2.push({data: item, className:etiqueta}))
-      
-    }
+    let typos = []
+    cantidades.map((item, i) => 
+    {
+      //console.log("Item ",item," i ",i)
+      switch (i) {
+        case 0:
+          // do something
+           console.log("etiquetas sub i",etiquetas[i])
+           series2.push({data: item, className:etiquetas[i]})
+           typos.push(etiquetas[i])
+          break;
+        case 1:
+          // do something
+          series2.push({data: item, className:etiquetas[i]})
+          typos.push(etiquetas[i])
+          break;
+        case 2:
+          series2.push({data: item, className:etiquetas[i]})
+          typos.push(etiquetas[i])
+          // do something
+          break;
+      }
 
+      });
     
+    
+    //console.log("cantidades",cantidades)
+    // cantidades.map( item => (
+    //   console.log("itemcantidades",item),
+    //   series2.push({data: item, className:'my-custom-class'})
+    //   )
+    // )
+    //console.log("etiquetas", etiquetas)
 
-    //cantidades.map(item => series2.push({data: item, className:'my-custom-class'}))
-    console.log("etiquetas", etiquetas)
-
-    console.log("cantidades", series2)
+    //console.log("cantidades", series2)
 
 
     //calculo el porcentaje que representa cada elemento del array 
@@ -313,7 +339,8 @@ class Dashboard extends Component {
     //console.log("Etiquetas", etiquetas)
     let legendDatosHora = {
       names: etiquetas,
-      types: ["danger", "info", "warning"]
+      // types: ["danger", "info", "warning"]
+      types: typos
     };
     //console.log(objetoDatosHora)
     //console.log(legendDatosHora)

@@ -87,26 +87,35 @@ html {
 .my-custom-class{
     fill: hsl(120, 40%, 60%);
   /* give your pie slices some outline or separate them visually by using the background color here */
-  stroke: white;
+  /* stroke: white; */
   /* outline width */
   stroke-width: 4px;
 }
 
-.pie-opcion-1{
-    fill: hsl(120, 40%, 60%);
-    stroke: white;
+.Desconocido{
+    fill: #1DC7EA;
+    /* stroke: white; */
   /* outline width */
-    stroke-width: 4px;
+    /* stroke-width: 1px; */
 }
-.pie-opcion-2{
-    fill: hsl(0, 64%, 20%);
-    stroke: white;
-  /* outline width */
-    stroke-width: 4px;
+.text-Desconocido{
+    color:#1DC7EA;
 }
-.pie-opcion-3{
-    fill: hsl(246, 65%, 20%);
-    stroke: white;
+.Distraccion{
+    fill: #FB404B;
+    /* stroke: white; */
   /* outline width */
-    stroke-width: 4px;
+    /* stroke-width: 1px; */
+}
+.text-Distraccion{
+    color: #FB404B;
+}
+.Tarea{
+    fill: #FFA534;
+    /* stroke: white; */
+  /* outline width */
+    /* stroke-width: 1px; */
+}
+.text-Tarea{
+    color: #FFA534;
 }
